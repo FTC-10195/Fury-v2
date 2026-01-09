@@ -60,20 +60,17 @@ public class SortingTest extends LinearOpMode {
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
             previousGamepad1.copy(gamepad1);
 
-            if (triangle){
-                sorter.getSlot().toDefault();
-            }
             if (LT){
-                sorter.getSlot().leftToShootAction();
+                sorter.getSlot().leftToCenter();
             }
             if (RT){
-                sorter.getSlot().rightToShootAction();
-            }
-            if (RB){
                 sorter.getSlot().rightToCenter();
             }
+            if (RB){
+                sorter.getSlot().centerToShootAction();
+            }
             if (LB){
-                sorter.getSlot().leftToCenter();
+                sorter.getSlot().toDefault();
             }
             lights.setMode(Lights.Mode.INTAKING);
             lights.setBall(sorter.getBallDetector().getBallColor());
