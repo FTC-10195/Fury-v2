@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
@@ -143,5 +144,8 @@ public class Flywheel {
         telemetry.addData("Pos diff", posDifference);
         telemetry.addData("Flywheel power", power);
         telemetry.addData("flywheelReady",isReady);
+    }
+    public void updateTelemetryPacket(TelemetryPacket telemetryPacket){
+        telemetryPacket.put("VelocityError",targetVelocity - currentVelocity);
     }
 }

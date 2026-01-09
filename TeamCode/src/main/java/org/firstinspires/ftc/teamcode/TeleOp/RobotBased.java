@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp
@@ -39,6 +40,8 @@ public class RobotBased extends LinearOpMode {
         flywheel.initiate(hardwareMap);
         Intake intake = new Intake();
         intake.initiate(hardwareMap);
+        Transfer transfer = new Transfer();
+        transfer.initiate(hardwareMap);
         Drivetrain drivetrain = new Drivetrain();
         drivetrain.initiate(hardwareMap);
         Lights lights = new Lights();
@@ -48,11 +51,8 @@ public class RobotBased extends LinearOpMode {
         turret.initiate(hardwareMap);
         turret.setGoal(lights.getTeamColor());
 
-        Spindexer spindexer = new Spindexer();
-        spindexer.initiate(hardwareMap);
-        spindexer.setMode(Spindexer.Modes.UNSORTED);
-        LimeLight limeLight = new LimeLight();
-        limeLight.initiate(hardwareMap);
+      //  LimeLight limeLight = new LimeLight();
+     //   limeLight.initiate(hardwareMap);
 
         TelemetryPacket telemetryPacket = new TelemetryPacket(true);
 
@@ -89,14 +89,12 @@ public class RobotBased extends LinearOpMode {
             }
             if (LB) {
                 state = States.RESTING;
-                spindexer.setState(Spindexer.States.RESTING);
-                spindexer.reset();
             }
             if (RB){
                 switch (turret.getState()){
                     case RESET:
                         turret.setState(Turret.States.AIM);
-                        followerHandler.setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
+                   //     followerHandler.setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
                         break;
                     case AIM:
                         turret.setState(Turret.States.RESET);
@@ -106,60 +104,36 @@ public class RobotBased extends LinearOpMode {
             switch (state) {
                 case RESTING:
                     intake.setState(Intake.States.OFF);
+                    transfer.setState(Transfer.States.OFF);
                     flywheel.setState(Flywheel.States.RESTING);
-                    if (spindexer.getMode() == Spindexer.Modes.SORTED) {
-                        lights.setMode(Lights.Mode.MOTIF);
-                    } else {
-                        lights.setMode(Lights.Mode.TEAM);
-                    }
                     if (LT) {
-                        state = States.INTAKING;
-                        spindexer.setState(Spindexer.States.INTAKING);
-                    }
+                        state = States.INTAKING;}
                     if (RT) {
                         state = States.PREPARING_TO_FIRE;
-                        flywheel.setState(Flywheel.States.SPINNING);
-                        spindexer.setState(Spindexer.States.CHAMBER);
-                    }
+                        flywheel.setState(Flywheel.States.SPINNING);}
                     break;
                 case INTAKING:
                     intake.setState(Intake.States.ON);
+                    transfer.setState(Transfer.States.ON);
                     flywheel.setState(Flywheel.States.RESTING);
                     lights.setMode(Lights.Mode.INTAKING);
-                    if (LT || spindexer.getState() == Spindexer.States.RESTING) {
+                    if (LT ) {
                         state = States.RESTING;
-                        spindexer.setState(Spindexer.States.RESTING);
-                        spindexer.reset();
                     }
                     break;
                 case PREPARING_TO_FIRE:
-                    if (spindexer.getMode() == Spindexer.Modes.SORTED) {
-                        lights.setMode(Lights.Mode.MOTIF);
-                    } else {
-                        lights.setMode(Lights.Mode.TEAM);
-                    }
+                    transfer.setState(Transfer.States.OFF);
                     intake.setState(Intake.States.OFF);
-                    if (flywheel.isReady && spindexer.getState() == Spindexer.States.RESTING && !spindexer.isRotating()) {
+                    if (flywheel.isReady) {
                         gamepad1.rumble(1, 10, 100);
                         if (RT) {
                             state = States.SHOOTING;
-                            spindexer.setState(Spindexer.States.SHOOTING);
                         }
                     }
                     break;
                 case SHOOTING:
-                    if (spindexer.getMode() == Spindexer.Modes.SORTED) {
-                        lights.setMode(Lights.Mode.INTAKING);
-                    } else {
-                        lights.setMode(Lights.Mode.TEAM);
-                    }
-
-                    intake.setState(Intake.States.OFF);
-                    if (spindexer.getState() == Spindexer.States.RESTING) {
-                        state = States.RESTING;
-                        spindexer.setState(Spindexer.States.RESTING);
-                        spindexer.reset();
-                    }
+                    intake.setState(Intake.States.ON);
+                    transfer.setState(Transfer.States.ON);
                     break;
             }
 
@@ -179,35 +153,20 @@ public class RobotBased extends LinearOpMode {
                     followerHandler.getFollower().breakFollowing();
                 }
             }
-            if (triangle) {
-                switch (spindexer.getMode()) {
-                    case UNSORTED:
-                        spindexer.setMode(Spindexer.Modes.SORTED);
-                        break;
-                    case SORTED:
-                        spindexer.setMode(Spindexer.Modes.UNSORTED);
-                        break;
-                }
-            }
-            if (circle) {
-                spindexer.rotate();
-            }
 
-            lights.setMotif(limeLight.getMotif());
-            spindexer.setMotif(limeLight.getMotif());
-
+        //    lights.setMotif(limeLight.getMotif());
             turret.setGoal(lights.getTeamColor());
             turret.setPose(followerHandler.getFollower().getPose());
 
             flywheel.setDefaultVelocity();
 
-            limeLight.update(telemetry);
+       //     limeLight.update(telemetry);
 
 
             flywheel.update();
             turret.update();
             intake.update();
-            spindexer.update();
+            transfer.update();
             followerHandler.update();
             if (!hold) {
                 drivetrain.update(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
@@ -223,17 +182,15 @@ public class RobotBased extends LinearOpMode {
             telemetry.addData("Y", followerHandler.getFollower().getPose().getY());
             telemetry.addData("Heading", followerHandler.getFollower().getPose().getHeading());
 
-
-            lights.setBall(spindexer.getSensors().getBallColor());
-
             lights.update(telemetry);
 
-            spindexer.status(telemetry);
             flywheel.status(telemetry);
             turret.status(telemetry);
             telemetry.update();
 
-            limeLight.ftcDashUpdate(telemetryPacket);
+      //      limeLight.ftcDashUpdate(telemetryPacket);
+            flywheel.updateTelemetryPacket(telemetryPacket);
+            FtcDashboard.getInstance().sendTelemetryPacket(telemetryPacket);
 
         }
         lights.reset();

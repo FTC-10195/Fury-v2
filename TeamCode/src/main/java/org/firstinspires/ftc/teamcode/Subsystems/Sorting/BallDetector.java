@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+package org.firstinspires.ftc.teamcode.Subsystems.Sorting;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -12,7 +12,7 @@ public class BallDetector {
 
     //Will tune thresholds more, hopefully it's this simple (GREEN VS BLUE) but it might not be
     public static int alphaThreshold1 = 250;
-    public static int alphaThreshold2 = 600;
+    public static int alphaThreshold2 = 250;
 
     ColorSensor colorSensor;
     ColorSensor colorSensor2;
@@ -33,6 +33,9 @@ public class BallDetector {
         }
 
         return LimeLight.BallColors.P;
+    }
+    public boolean isBall(){
+        return getBallColor() != LimeLight.BallColors.NONE;
     }
     public void status(Telemetry telemetry){
         telemetry.addData("Color Sensor Ball", getBallColor());

@@ -25,13 +25,15 @@ public class FollowerHandler {
     public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(0));
 
 
-    public static Pose pose;
+    private Pose pose;
+    public static Pose savedPose;
     Follower follower;
     public void initiate(HardwareMap hardwareMap){
         follower = Constants.createFollower(hardwareMap);
         setPathMode();
-        if (pose == null){
-            pose = defaultPose;
+        if (savedPose == null){
+            savedPose = defaultPose;
+            pose = savedPose;
         }
         follower.setStartingPose(pose);
     }
@@ -51,13 +53,13 @@ public class FollowerHandler {
        }
     }
     public void save(){
-        pose = follower.getPose();
+        savedPose = follower.getPose();
     }
     public void load(){
-        if (pose == null){
-            pose = defaultPose;
+        if (savedPose == null){
+            savedPose = defaultPose;
         }
-        follower.setPose(pose);
+        follower.setPose(savedPose);
     }
 
     //For relocalization
