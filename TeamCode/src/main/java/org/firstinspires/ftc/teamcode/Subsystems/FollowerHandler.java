@@ -24,18 +24,39 @@ public class FollowerHandler {
     public static Pose blueHumanPlayer = new Pose(132.89211422087746,10.021180030257188,Math.toRadians(0));
     public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(0));
 
-
-    private Pose pose;
     public static Pose savedPose;
     Follower follower;
+
+    boolean locked = false;
+    Pose holdPose;
+    boolean saved = false;
+    public void lock(){
+        locked = true;
+        holdPose = follower.getPose();
+        setBrakeMode();
+
+        follower.updateConstants();
+        follower.holdPoint(holdPose);
+    }
+    public void unlock(){
+        locked = false;
+        follower.breakFollowing();
+    }
+    public void flipLock(){
+       if (locked){
+           unlock();
+           return;
+       }
+       lock();
+    }
+    public boolean isLocked(){
+        return locked;
+    }
+
     public void initiate(HardwareMap hardwareMap){
         follower = Constants.createFollower(hardwareMap);
         setPathMode();
-        if (savedPose == null){
-            savedPose = defaultPose;
-            pose = savedPose;
-        }
-        follower.setStartingPose(pose);
+        load();
     }
     public void forceRelocalize(Lights.TeamColors teamColor){
        switch (teamColor){
@@ -53,22 +74,21 @@ public class FollowerHandler {
        }
     }
     public void save(){
+        saved = true;
         savedPose = follower.getPose();
     }
     public void load(){
-        if (savedPose == null){
+        if (savedPose == null || !saved){
             savedPose = defaultPose;
         }
         follower.setPose(savedPose);
     }
+    public void reset(){
+        saved = false;
+    }
 
     //For relocalization
-    public void setPose(Pose newPose){
-        pose = newPose;
-        follower.setPose(pose);
-    }
     public void setStartingPose(Pose newPose){
-        pose = newPose;
         follower.setStartingPose(newPose);
         follower.setPose(newPose);
     }
@@ -97,6 +117,12 @@ public class FollowerHandler {
         follower.update();
     }
     public void status(Telemetry telemetry){
-        telemetry.addData("FollowerHandlerPose",pose);
+        telemetry.addData("FollowerHandlerPose",follower.getPose());
+        telemetry.addData("Lock", locked);
+        telemetry.addData("HoldPose",holdPose);
+
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", follower.getPose().getHeading());
     }
 }
