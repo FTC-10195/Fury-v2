@@ -47,6 +47,8 @@ public class DrivetrainOnly extends LinearOpMode {
             boolean triangle = gamepad1.triangle && !previousGamepad1.triangle;
             boolean X = gamepad1.cross && !previousGamepad1.cross;
             boolean square = gamepad1.square && !previousGamepad1.square;
+            boolean RB = gamepad1.right_bumper && !previousGamepad1.right_bumper;
+            boolean LB = gamepad1.left_bumper && !previousGamepad1.left_bumper;
 
             previousGamepad1.copy(gamepad1);
 
@@ -59,6 +61,12 @@ public class DrivetrainOnly extends LinearOpMode {
 
             if (square) {
                 followerHandler.flipLock();
+            }
+            if (RB){
+                followerHandler.forceRelocalize(lights.getTeamColor());
+            }
+            if (LB){
+                drivetrain.switchHeadingLock();
             }
 
             followerHandler.update();

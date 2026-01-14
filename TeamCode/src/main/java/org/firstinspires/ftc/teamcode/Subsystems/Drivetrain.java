@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,6 +16,8 @@ public class Drivetrain {
         FIELD,
         ROBOT
     }
+    public static double headingLockP = -.8;
+    public static double headingLockD = 0;
     public static double flP = 1;
     public static double frP = 1;
     public static double blP = 1;
@@ -23,7 +27,20 @@ public class Drivetrain {
     public static double blueOffset = 180;
 
     Mode mode = Mode.ROBOT;
+    boolean headingLock = false;
+    public void switchHeadingLock(){
+        headingLock = !headingLock;
+    }
+    public void setHeadingLock(boolean headingLock){
+        this.headingLock = headingLock;
+    }
+    public boolean getHeadingLock(){
+        return headingLock;
+    }
+
     double yaw = 0;
+    double lockYaw = 0;
+    PIDFController headingLockController = new PIDFController(new PIDFCoefficients(headingLockP,0,headingLockD,0));
     Lights.TeamColors team = Lights.TeamColors.RED;
     public void setTeam(Lights.TeamColors team){
         this.team = team;
@@ -85,7 +102,15 @@ public class Drivetrain {
     }
 
     public void update(double x, double y, double rx) {
-
+        headingLockController = new PIDFController(new PIDFCoefficients(headingLockP,0,headingLockD,0));
+        headingLockController.setTargetPosition(lockYaw);
+        headingLockController.updatePosition(yaw);
+        if (headingLock && Math.abs(rx) > .1){
+            lockYaw = yaw;
+        }
+        if (Math.abs(rx) < .1 && headingLock){
+            rx += (headingLockController.run());
+        }
 
         y = -y;
 
@@ -118,6 +143,8 @@ public class Drivetrain {
         telemetry.addData("DT Yaw Degrees", Math.toDegrees(yaw));
         telemetry.addData("DT Mode",mode);
         telemetry.addData("DT Team",team);
+        telemetry.addData("Heading lock",headingLock);
+        telemetry.addData("Heading lock yaw",lockYaw);
         telemetry.addData("FL power",frontLeftMotor.getPower());
         telemetry.addData("FR power",frontRightMotor.getPower());
         telemetry.addData("BL power",backLeftMotor.getPower());

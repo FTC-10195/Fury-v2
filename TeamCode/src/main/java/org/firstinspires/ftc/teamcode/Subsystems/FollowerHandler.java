@@ -20,7 +20,7 @@ public class FollowerHandler {
     public static double pathingPTranslational = 0.3;
 
     public static double mass = 12;
-    public static Pose defaultPose = new Pose(72,72,Math.toRadians(90));
+    public static Pose defaultPose = new Pose(72,72,Math.toRadians(0));
     public static Pose blueHumanPlayer = new Pose(132.89211422087746,10.021180030257188,Math.toRadians(0));
     public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(0));
 
@@ -97,20 +97,20 @@ public class FollowerHandler {
     }
     public void setBrakeMode(){
         follower.setConstants( new FollowerConstants()
-                .forwardZeroPowerAcceleration(-72.417)
-                .lateralZeroPowerAcceleration(-83.947)
+                .mass(Constants.followerConstants.getMass())
+                .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
+                .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
                 .headingPIDFCoefficients(new PIDFCoefficients(brakePHeading,0,0,0.01))
-                .translationalPIDFCoefficients(new PIDFCoefficients(brakePTranslational,0,brakeDTranslational,0.01))
-                .mass(mass));
+                .translationalPIDFCoefficients(new PIDFCoefficients(brakePTranslational,0,brakeDTranslational,0.01)));
         follower.updateConstants();
     }
     public void setPathMode(){
         follower.setConstants( new FollowerConstants()
-                .forwardZeroPowerAcceleration(-72.417)
-                .lateralZeroPowerAcceleration(-83.947)
+                .mass(Constants.followerConstants.getMass())
+                .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
+                .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
                 .headingPIDFCoefficients(new PIDFCoefficients(pathingPHeading,0,0,0.01))
-                .translationalPIDFCoefficients(new PIDFCoefficients(pathingPTranslational,0,pathingDTranslational,0.01))
-                .mass(mass));
+                .translationalPIDFCoefficients(new PIDFCoefficients(pathingPTranslational,0,pathingDTranslational,0.01)));
         follower.updateConstants();
     }
     public void update(){
