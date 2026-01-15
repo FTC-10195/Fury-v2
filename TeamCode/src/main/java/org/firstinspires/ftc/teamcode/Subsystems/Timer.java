@@ -7,6 +7,10 @@ public class Timer {
         this.waitTime = 0;
         timeSnapshot = System.currentTimeMillis();
     }
+    public Timer (long waitTime){
+        this.waitTime = waitTime;
+        timeSnapshot = System.currentTimeMillis();
+    }
     public void setWait(long waitTime){
         this.waitTime = waitTime;
         timeSnapshot = System.currentTimeMillis();

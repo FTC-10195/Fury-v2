@@ -70,7 +70,7 @@ public class DrivetrainOnly extends LinearOpMode {
             }
 
             followerHandler.update();
-            drivetrain.setHeading(followerHandler.getFollower().getHeading());
+            drivetrain.setYaw(followerHandler.getFollower().getHeading());
             drivetrain.setTeam(lights.getTeamColor());
             lights.update(telemetry);
 
