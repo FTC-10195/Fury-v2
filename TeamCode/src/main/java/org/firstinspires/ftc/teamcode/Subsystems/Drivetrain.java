@@ -18,6 +18,7 @@ public class Drivetrain {
     }
     public static double headingLockP = -.02;
     public static double headingLockD = 0;
+    public static long headingLockTolerance = 1000;
     public static double flP = 1;
     public static double frP = 1;
     public static double blP = 1;
@@ -41,6 +42,7 @@ public class Drivetrain {
     double yaw = 0;
     double lockYaw = 0;
     Lights.TeamColors team = Lights.TeamColors.RED;
+    Timer headingLockTimer = new Timer(headingLockTolerance);
     public void setTeam(Lights.TeamColors team){
         this.team = team;
     }
@@ -120,9 +122,10 @@ public class Drivetrain {
         convertedYaw = angleWrap(convertedYaw);
         if (headingLock && Math.abs(rx) > .1){
             lockYaw = convertedYaw;
+            headingLockTimer.setWait(headingLockTolerance);
         }
         error = calculateError(convertedYaw,lockYaw);
-        if (Math.abs(rx) < .1 && headingLock){
+        if (Math.abs(rx) < .1 && headingLock && headingLockTimer.doneWaiting()){
             rx +=  error * headingLockP;
         }
 
