@@ -17,10 +17,10 @@ public class Turret {
     Servo rightServo; //Dominant
     Servo leftServo;
     public static double startPos = .5;
-    public static double maxDegrees = 220; //-1100 to 110
+    public static double maxDegrees = 315; //-1100 to 110
     public static double overridePos = .75;
     public static double degreesToTicks(double degrees){
-        return startPos - (degrees/maxDegrees);
+        return startPos + (degrees/maxDegrees);
     }
     public static Pose redGoal = new Pose(144,144);
     public static Pose blueGoal = new Pose(0,144);
@@ -67,12 +67,18 @@ public class Turret {
     public Pose getGoal(){
         return goal;
     }
+    double turretAngle;
     public double calculateHeading(){
+        //RADIANS
         deltaX = goal.getX() - robotPose.getX();
         deltaY = goal.getY() - robotPose.getY();
         theta = Math.atan2(deltaY,deltaX);
+        turretAngle = theta - robotPose.getHeading();
+        if (turretAngle > Math.PI){
+            turretAngle = -((2 * Math.PI) - turretAngle);
+        }
 
-        return theta - robotPose.getHeading();
+        return turretAngle;
     }
 
 
@@ -81,14 +87,14 @@ public class Turret {
         leftServo = hardwareMap.servo.get("lt");
     }
     public void status(Telemetry telemetry){
+        telemetry.addLine("TURRET -----------");
         telemetry.addData("turret target",target);
         telemetry.addData("turret state", state);
         telemetry.addData("Delta X", deltaX);
         telemetry.addData("Delta Y",deltaY);
-        telemetry.addData("Theta", theta);
-        telemetry.addData("Calculated heading", calculateHeading());
+        telemetry.addData("Theta Degrees", Math.toDegrees(theta));
         telemetry.addData("Robot heading degrees", Math.toDegrees(robotPose.getHeading()));
-        telemetry.addData("Degrees", Math.toDegrees(calculateHeading()));
+        telemetry.addData("Turret Degrees", Math.toDegrees(calculateHeading()));
     }
     public void setOverride(double pos){
         overridePos = pos;

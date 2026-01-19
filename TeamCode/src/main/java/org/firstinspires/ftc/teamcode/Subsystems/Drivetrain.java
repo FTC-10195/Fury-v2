@@ -16,9 +16,6 @@ public class Drivetrain {
         FIELD,
         ROBOT
     }
-    public static double headingLockP = -.02;
-    public static double headingLockD = 0;
-    public static long headingLockTolerance = 1000;
     public static double flP = 1;
     public static double frP = 1;
     public static double blP = 1;
@@ -28,21 +25,9 @@ public class Drivetrain {
     public static double blueOffset = 180;
 
     Mode mode = Mode.ROBOT;
-    boolean headingLock = false;
-    public void switchHeadingLock(){
-        headingLock = !headingLock;
-    }
-    public void setHeadingLock(boolean headingLock){
-        this.headingLock = headingLock;
-    }
-    public boolean getHeadingLock(){
-        return headingLock;
-    }
 
     double yaw = 0;
-    double lockYaw = 0;
     Lights.TeamColors team = Lights.TeamColors.RED;
-    Timer headingLockTimer = new Timer(headingLockTolerance);
     public void setTeam(Lights.TeamColors team){
         this.team = team;
     }
@@ -101,33 +86,7 @@ public class Drivetrain {
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public static double angleWrap(double degree){
-        if (degree < 0){
-            return degree + 360;
-        }
-        return degree;
-    }
-    public static double calculateError(double current, double target){
-        double error = target - current;
-        if (Math.abs(error) > 180){
-            return (Math.abs(error) - 360) * Math.signum(error);
-        }
-        return error;
-    }
-    double error = 0;
-    double convertedYaw = 0;
     public void update(double x, double y, double rx) {
-        //Convert to degrees
-        convertedYaw = Math.toDegrees(yaw);
-        convertedYaw = angleWrap(convertedYaw);
-        if (headingLock && Math.abs(rx) > .1){
-            lockYaw = convertedYaw;
-            headingLockTimer.setWait(headingLockTolerance);
-        }
-        error = calculateError(convertedYaw,lockYaw);
-        if (Math.abs(rx) < .1 && headingLock && headingLockTimer.doneWaiting()){
-            rx +=  error * headingLockP;
-        }
 
         y = -y;
 
@@ -157,13 +116,10 @@ public class Drivetrain {
     }
 
     public void status(Telemetry telemetry){
+        telemetry.addLine("DRIVETRAIN -----------");
         telemetry.addData("DT Yaw Degrees", yaw);
         telemetry.addData("DT Mode",mode);
         telemetry.addData("DT Team",team);
-        telemetry.addData("Heading lock",headingLock);
-        telemetry.addData("Heading lock converted yaw",convertedYaw);
-        telemetry.addData("Heading lock yaw",lockYaw);
-        telemetry.addData("Heading Lock Error",error);
         telemetry.addData("FL power",frontLeftMotor.getPower());
         telemetry.addData("FR power",frontRightMotor.getPower());
         telemetry.addData("BL power",backLeftMotor.getPower());

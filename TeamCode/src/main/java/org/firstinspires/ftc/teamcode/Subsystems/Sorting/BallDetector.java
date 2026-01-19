@@ -38,6 +38,7 @@ public class BallDetector {
         return getBallColor() != LimeLight.BallColors.NONE;
     }
     public void status(Telemetry telemetry){
+        telemetry.addLine("COLOR SENSORS -----------");
         telemetry.addData("Color Sensor Ball", getBallColor());
         telemetry.addData("Color Sensor1 Reading: ","\n Red: " + colorSensor.red() + "\n" +
                 "Green: " + colorSensor.green() + "\n" +

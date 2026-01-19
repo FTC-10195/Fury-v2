@@ -145,6 +145,7 @@ public class Lights {
 
     public void update(Telemetry telemetry) {
         load();
+        telemetry.addLine("LIGHTS -----------");
         telemetry.addData("TeamColor", teamColor);
         telemetry.addData("LightsMode",mode);
         rgbIndicator.setPosition(color);

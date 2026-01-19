@@ -18,14 +18,17 @@ public class Flywheel {
         SPINNING,
         RESTING,
     }
-
+    public enum Zone{
+        FAR,
+        NEAR
+    }
+    Zone zone = Zone.NEAR;
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
     public static long waitTime = 500;
-    public static double maxVelocity = 2100;
-    public static double minVelocity = 1450;
-    public static double defaultVelocity = 1600;
-    public static double kN = 1.3;
+    public static double farVelocityIncrease = 250;
+    public static double defaultVelocity = 1550;
+    public static double farDistance = 110;
     public static double kP = 0.0012;
     public static double kI = 0;
     public static double kD = 0;
@@ -33,12 +36,10 @@ public class Flywheel {
     public static double tolerance = 100;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
-    public static double maxDistance = 150;
-    public static double minDistance = 30;
     public static double rMod = 1;
     public static double lMod = -1;
     private double targetVelocity = defaultVelocity;
-    private int manualVelocityNumber = 0;
+    private double manualVelocity = 0;
 
     Timer overideTimer = new Timer();
 
@@ -61,6 +62,7 @@ public class Flywheel {
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 
@@ -70,36 +72,49 @@ public class Flywheel {
         }
         currentState = newState;
     }
+    public void flipState(){
+        switch (currentState){
+            case RESTING:
+                currentState = States.SPINNING;
+                break;
+            case SPINNING:
+                currentState = States.RESTING;
+                break;
+        }
+    }
     double prevPos = 0;
     double posDifference = 0;
     long timeSnapshot = System.currentTimeMillis();
     double timeDifference = 0;
     double power = 0;
     static double distance = 0;
-    public static double calculateTargetVelocity(Pose robotPose, Pose goal){
+    public void calculateZone(Pose robotPose, Lights.TeamColors color){
+        calculateZone(robotPose,Turret.getGoal(color));
+    }
+    private void calculateZone(Pose robotPose, Pose goal){
         double deltaX = goal.getX() - robotPose.getX();
         double deltaY = goal.getY() - robotPose.getY();
         distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
-        distance = distance - minDistance;
-        if (distance < minDistance){
-            distance = minDistance;
+        if (distance > farDistance){
+            zone = Zone.FAR;
+            return;
         }
-        return minVelocity + Math.pow(distance/(maxDistance - minDistance),kN) * (maxVelocity - minVelocity);
-    }
-    public void setTargetVelocity(double targetVelocity){
-        this.targetVelocity = targetVelocity;
-    }
-    public void setDefaultVelocity(){
-        this.targetVelocity = defaultVelocity + (manualVelocityNumber * manualVelocityGain);
+        zone = Zone.NEAR;
     }
     public void add(){
-        manualVelocityNumber++;
+        manualVelocity += manualVelocityGain;
     }
     public void sub(){
-        manualVelocityNumber--;
+        manualVelocity -= manualVelocity;
     }
 
     public void update() {
+        if (zone == Zone.FAR){
+            targetVelocity = defaultVelocity + manualVelocity + farVelocityIncrease;
+            return;
+        }
+        targetVelocity = defaultVelocity + manualVelocity;
+
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
         pidfController.setTargetPosition(targetVelocity);
         pidfController.updatePosition(currentVelocity);
@@ -136,6 +151,7 @@ public class Flywheel {
         flywheel2.setPower(power * lMod);
     }
     public void status (Telemetry telemetry) {
+        telemetry.addLine("FLYWHEEL -----------");
         telemetry.addData("Distance",distance);
         telemetry.addData("Calculated velocity", currentVelocity);
         telemetry.addData("Calculated VelocityError", targetVelocity - currentVelocity);

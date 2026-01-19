@@ -1,0 +1,48 @@
+package org.firstinspires.ftc.teamcode.Subsystems;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+
+public class Gate {
+    public enum State{
+        CLOSE,
+        OPEN
+    }
+    public static double closePos = .5;
+    public static double openPos = .3;
+    public static long gateWaitTime = 1000;
+    State currentState = State.CLOSE;
+    Timer timer = new Timer();
+    Servo servo;
+    public void initiate(HardwareMap hardwareMap){
+        servo = hardwareMap.servo.get("gate");
+    }
+    public void shoot(){
+        timer.setWait(gateWaitTime);
+        currentState = State.OPEN;
+    }
+    public boolean doneShooting(){
+        return currentState == State.CLOSE;
+    }
+    public void update(){
+        switch (currentState){
+            case OPEN:
+                if (timer.doneWaiting()){
+                    currentState = State.CLOSE;
+                }
+                servo.setPosition(openPos);
+                break;
+            case CLOSE:
+                servo.setPosition(closePos);
+                break;
+        }
+    }
+    public void status(Telemetry telemetry){
+        telemetry.addLine("GATE ------");
+        telemetry.addData("State",currentState);
+    }
+
+}

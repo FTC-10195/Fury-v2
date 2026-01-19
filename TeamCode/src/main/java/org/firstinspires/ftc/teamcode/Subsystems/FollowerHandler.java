@@ -116,6 +116,7 @@ public class FollowerHandler {
         follower.update();
     }
     public void status(Telemetry telemetry){
+        telemetry.addLine("FOLLOWER HANDLER -----------");
         telemetry.addData("FollowerHandlerPose",follower.getPose());
         telemetry.addData("Lock", locked);
         telemetry.addData("HoldPose",holdPose);

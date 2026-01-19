@@ -34,7 +34,7 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(5.025)
-            .strafePodX(3.75)
+            .strafePodX(4)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

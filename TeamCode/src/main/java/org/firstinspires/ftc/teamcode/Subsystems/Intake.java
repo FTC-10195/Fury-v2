@@ -29,12 +29,28 @@ public class Intake {
 
 
     DcMotor intakeMotor;
+    DcMotor transferMotor;
     public States getState() {
         return currentState;
+    }
+    public void flipState(){
+        switch (currentState){
+            case ON:
+            case OUTTAKE:
+                currentState = States.OFF;
+                break;
+            case OFF:
+                currentState = States.ON;
+                break;
+        }
     }
 
 
     public void initiate(HardwareMap hardwaremap){
+        transferMotor = hardwaremap.dcMotor.get("transfer");
+        transferMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
         intakeMotor = hardwaremap.dcMotor.get("intake");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -51,6 +67,7 @@ public class Intake {
                 intakeMotor.setPower(ejectPower);
                 break;
         }
+        transferMotor.setPower(intakeMotor.getPower());
     }
 }
 
