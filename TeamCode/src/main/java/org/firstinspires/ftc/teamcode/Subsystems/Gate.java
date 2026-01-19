@@ -9,11 +9,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Gate {
     public enum State{
         CLOSE,
-        OPEN
+        OPENNING,
+        OPEN,
+        CLOSING
     }
     public static double closePos = .5;
     public static double openPos = .3;
     public static long gateWaitTime = 1000;
+    public static long gateTransitionTime = 250;
     State currentState = State.CLOSE;
     Timer timer = new Timer();
     Servo servo;
@@ -21,19 +24,36 @@ public class Gate {
         servo = hardwareMap.servo.get("gate");
     }
     public void shoot(){
-        timer.setWait(gateWaitTime);
-        currentState = State.OPEN;
+        timer.setWait(gateTransitionTime);
+        currentState = State.OPENNING;
+    }
+    public State getState(){
+        return currentState;
     }
     public boolean doneShooting(){
         return currentState == State.CLOSE;
     }
     public void update(){
         switch (currentState){
+            case OPENNING:
+                if (timer.doneWaiting()){
+                    currentState = State.OPEN;
+                    timer.setWait(gateWaitTime);
+                }
+                servo.setPosition(openPos);
+                break;
             case OPEN:
+                if (timer.doneWaiting()){
+                    currentState = State.CLOSING;
+                    timer.setWait(gateTransitionTime);
+                }
+                servo.setPosition(openPos);
+                break;
+            case CLOSING:
                 if (timer.doneWaiting()){
                     currentState = State.CLOSE;
                 }
-                servo.setPosition(openPos);
+                servo.setPosition(closePos);
                 break;
             case CLOSE:
                 servo.setPosition(closePos);
