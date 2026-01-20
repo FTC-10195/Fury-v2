@@ -8,6 +8,7 @@ import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,28 +17,30 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Flywheel {
     public enum States {
         SPINNING,
-        RESTING,
+        PASSIVE
     }
     public enum Zone{
         FAR,
         NEAR
     }
+    public boolean on = true;
     Zone zone = Zone.NEAR;
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
-    public static long waitTime = 500;
+    public static long waitTime = 1000;
     public static double farVelocityIncrease = 250;
     public static double defaultVelocity = 1550;
     public static double farDistance = 110;
-    public static double kP = 0.0012;
+    public static double passivePower = .08;
+    public static double kP = 0.001;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00041;
+    public static double kF = 0.00042;
     public static double tolerance = 100;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
-    public static double rMod = 1;
-    public static double lMod = -1;
+    public static double rMod = -1;
+    public static double lMod = 1;
     private double targetVelocity = defaultVelocity;
     private double manualVelocity = 0;
 
@@ -53,14 +56,16 @@ public class Flywheel {
     }
 
 
-    public States currentState = States.RESTING;
+    public States currentState = States.PASSIVE;
     DcMotorEx flywheel;
     DcMotorEx flywheel2;
     public void initiate(HardwareMap hardwareMap) {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         flywheel2 = hardwareMap.get(DcMotorEx.class, "fly2");
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+       flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
@@ -74,11 +79,11 @@ public class Flywheel {
     }
     public void flipState(){
         switch (currentState){
-            case RESTING:
+            case PASSIVE:
                 currentState = States.SPINNING;
                 break;
             case SPINNING:
-                currentState = States.RESTING;
+                currentState = States.PASSIVE;
                 break;
         }
     }
@@ -109,6 +114,7 @@ public class Flywheel {
     }
 
     public void update() {
+
         if (zone == Zone.FAR){
             targetVelocity = defaultVelocity + manualVelocity + farVelocityIncrease;
             return;
@@ -120,6 +126,7 @@ public class Flywheel {
         pidfController.updatePosition(currentVelocity);
 
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         posDifference = flywheel.getCurrentPosition() - prevPos;
         timeDifference = (double) ((System.currentTimeMillis() - timeSnapshot) / 1000.00); //Convert to seconds
@@ -127,12 +134,15 @@ public class Flywheel {
         timeSnapshot = System.currentTimeMillis();
         prevPos = flywheel.getCurrentPosition();
 
-        currentVelocity = posDifference / (timeDifference) * lMod;
+        currentVelocity = posDifference / (timeDifference) * rMod;
 
 
       switch (getState()){
-          case RESTING:
-              power = 0;
+          case PASSIVE:
+              power = passivePower;
+              if (!on){
+                  power = 0;
+              }
               isReady = false;
               break;
           case SPINNING:

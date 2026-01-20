@@ -5,12 +5,10 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
@@ -52,22 +50,22 @@ public class Near15BallWITHGATE extends LinearOpMode {
 
     public void buildPaths() {
 
-        final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, Math.toRadians(180)); // Start Pose of our robot.
-        final Pose shootPose = new Pose(calculateX(53.20830181543116), 82.8124054462935, Math.toRadians(180));
-        final Pose intakePose1 = new Pose(calculateX(14.583963691376697), 64.70650529500753, Math.toRadians(180));
+        final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
+        final Pose shootPose = new Pose(calculateX(53.20830181543116), 82.8124054462935, calculateHeading(180));
+        final Pose intakePose1 = new Pose(calculateX(14.583963691376697), 64.70650529500753, calculateHeading(180));
         final Pose intakeControl1 = new Pose(calculateX(44.778129727685325),53.09909228441754);
-        final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, Math.toRadians(180));
+        final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, calculateHeading(180));
         final Pose shootControl2 = new Pose(calculateX(41.81996974281392),62.75869894099847);
-        final Pose intakePose2 = new Pose(calculateX(17.56278366111951), 77.84266263237518, Math.toRadians(180));
+        final Pose intakePose2 = new Pose(calculateX(17.56278366111951), 77.84266263237518, calculateHeading(180));
         final Pose intakeControl2 = new Pose(calculateX(54.414523449319205), 93.89409984871406);
 
-        final Pose intakePose3 = new Pose(calculateX(14), 38, Math.toRadians(180));
+        final Pose intakePose3 = new Pose(calculateX(14), 38, calculateHeading(180));
         final Pose intakeControl3 = new Pose(calculateX(54.728441754916794), 29.568078668683814);
-        final Pose shootPose3 = new Pose(calculateX(53.5249621785174),79.36308623298032, Math.toRadians(180));
-        final Pose intakePose4 = new Pose(calculateX(8.084720121028745),9.060514372163404,Math.toRadians(180));
+        final Pose shootPose3 = new Pose(calculateX(53.5249621785174),79.36308623298032, calculateHeading(180));
+        final Pose intakePose4 = new Pose(calculateX(8.084720121028745),9.060514372163404,calculateHeading(180));
         final Pose intakeControl4 = new Pose(calculateX(46.160363086232984),32.1142208774584);
 
-        final Pose leavePose = new Pose(calculateX(32.161875945537055),66.82904689863841, Math.toRadians(180));
+        final Pose leavePose = new Pose(calculateX(32.161875945537055),66.82904689863841, calculateHeading(180));
 
 
 
@@ -257,7 +255,7 @@ public class Near15BallWITHGATE extends LinearOpMode {
                     break;
                 case 2:
                     path += command.runFollow(intakeFirst,2000);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 3:
                     intake.setState(Intake.States.OFF);
@@ -269,7 +267,7 @@ public class Near15BallWITHGATE extends LinearOpMode {
                     break;
                 case 5:
                     path += command.runFollow(intakeSecond,2000);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 6:
                     intake.setState(Intake.States.OFF);
@@ -281,7 +279,7 @@ public class Near15BallWITHGATE extends LinearOpMode {
                     break;
                 case 8:
                     path += command.runFollow(intakeThird,2500);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 9:
                     intake.setState(Intake.States.OFF);
@@ -293,7 +291,7 @@ public class Near15BallWITHGATE extends LinearOpMode {
                     break;
                 case 11:
                     path += command.runFollow(intakeFourth,2500);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 12:
                     intake.setState(Intake.States.OFF);

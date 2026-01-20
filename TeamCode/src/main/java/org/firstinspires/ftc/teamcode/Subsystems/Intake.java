@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @Config
 public class Intake {
     public enum States {
-        ON,
+        INTAKE,
+        PREPARING_TO_FIRE,
+        SHOOTING,
         OFF,
-        OUTTAKE,
+        EJECT,
     }
 
 
@@ -35,12 +35,12 @@ public class Intake {
     }
     public void flipState(){
         switch (currentState){
-            case ON:
-            case OUTTAKE:
+            case INTAKE:
+            case EJECT:
                 currentState = States.OFF;
                 break;
             case OFF:
-                currentState = States.ON;
+                currentState = States.INTAKE;
                 break;
         }
     }
@@ -57,17 +57,27 @@ public class Intake {
     }
     public void update(){
         switch(currentState){
-            case ON:
+            case INTAKE:
                 intakeMotor.setPower(intakePower);
+                transferMotor.setPower(intakeMotor.getPower());
                 break;
             case OFF:
                 intakeMotor.setPower(0);
+                transferMotor.setPower(intakeMotor.getPower());
                 break;
-            case OUTTAKE:
+            case EJECT:
                 intakeMotor.setPower(ejectPower);
+                transferMotor.setPower(intakeMotor.getPower());
+                break;
+            case SHOOTING:
+                intakeMotor.setPower(intakePower);
+                transferMotor.setPower(intakeMotor.getPower());
+                break;
+            case PREPARING_TO_FIRE:
+                intakeMotor.setPower(intakePower);
+                transferMotor.setPower(0);
                 break;
         }
-        transferMotor.setPower(intakeMotor.getPower());
     }
 }
 

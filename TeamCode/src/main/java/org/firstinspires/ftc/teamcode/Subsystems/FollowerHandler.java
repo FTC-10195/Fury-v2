@@ -12,7 +12,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Config
 public class FollowerHandler {
     public static double brakeDTranslational = 0.1;
-    public static double brakePHeading = 4;
+    public static double brakePHeading = 8;
+    public static double brakeDHeading = 1.2;
+
     public static double brakePTranslational = 0.6;
 
     public static double pathingDTranslational  = 0.1;
@@ -99,7 +101,7 @@ public class FollowerHandler {
                 .mass(Constants.followerConstants.getMass())
                 .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
                 .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
-                .headingPIDFCoefficients(new PIDFCoefficients(brakePHeading,0,0,0.01))
+                .headingPIDFCoefficients(new PIDFCoefficients(brakePHeading,0,brakeDHeading,0.01))
                 .translationalPIDFCoefficients(new PIDFCoefficients(brakePTranslational,0,brakeDTranslational,0.01)));
         follower.updateConstants();
     }

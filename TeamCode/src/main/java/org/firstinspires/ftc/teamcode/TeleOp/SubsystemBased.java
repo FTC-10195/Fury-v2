@@ -76,16 +76,16 @@ public class SubsystemBased extends LinearOpMode {
             }
             if (LB){
                 intake.setState(Intake.States.OFF);
-                flywheel.setState(Flywheel.States.RESTING);
+                flywheel.setState(Flywheel.States.PASSIVE);
             }
             if (RT){
                 gate.shoot();
             }
             if (X){
-                if (intake.getState() == Intake.States.OUTTAKE){
+                if (intake.getState() == Intake.States.EJECT){
                     intake.setState(Intake.States.OFF);
                 }else {
-                    intake.setState(Intake.States.OUTTAKE);
+                    intake.setState(Intake.States.EJECT);
                 }
             }
 

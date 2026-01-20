@@ -4,11 +4,11 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
@@ -68,7 +68,6 @@ public class RobotBased extends LinearOpMode {
 
             boolean LB = gamepad1.left_bumper && !previousGamepad1.left_bumper;
             boolean RB = gamepad1.right_bumper && !previousGamepad1.right_bumper;
-            boolean X = gamepad1.cross && !previousGamepad1.cross;
             boolean square = gamepad1.square && !previousGamepad1.square;
             boolean triangle = gamepad1.triangle && !previousGamepad1.triangle;
             boolean LT = gamepad1.left_trigger > 0.1 && previousGamepad1.left_trigger <= 0.1;
@@ -78,6 +77,10 @@ public class RobotBased extends LinearOpMode {
             boolean up = gamepad1.dpad_up && !previousGamepad1.dpad_up;
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
             previousGamepad1.copy(gamepad1);
+
+            if (triangle){
+                flywheel.on = !flywheel.on;
+            }
             if (circle){
                 followerHandler.forceRelocalize(lights.getTeamColor());
                 gamepad1.rumble(1, 10, 100);
@@ -110,22 +113,30 @@ public class RobotBased extends LinearOpMode {
             switch (state) {
                 case RESTING:
                     intake.setState(Intake.States.OFF);
-                    flywheel.setState(Flywheel.States.RESTING);
+                    flywheel.setState(Flywheel.States.PASSIVE);
                     if (LT) {
-                        state = States.INTAKING;}
+                        state = States.INTAKING;
+                    }
                     if (RT) {
                         state = States.PREPARING_TO_FIRE;
-                        flywheel.setState(Flywheel.States.SPINNING);}
+                    }
                     break;
                 case INTAKING:
-                    intake.setState(Intake.States.ON);
-                    flywheel.setState(Flywheel.States.RESTING);
+                    intake.setState(Intake.States.INTAKE);
+                    flywheel.setState(Flywheel.States.PASSIVE);
                     lights.setMode(Lights.Mode.INTAKING);
-                    if (LT ) {
+                    if (LT) {
                         state = States.RESTING;
+                    }
+                    if (RT) {
+                        state = States.PREPARING_TO_FIRE;
                     }
                     break;
                 case PREPARING_TO_FIRE:
+                    flywheel.setState(Flywheel.States.SPINNING);
+                    if (LT) {
+                        state = States.INTAKING;
+                    }
                     intake.setState(Intake.States.OFF);
                     if (flywheel.isReady) {
                         gamepad1.rumble(1, 10, 100);
@@ -136,7 +147,8 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case SHOOTING:
-                    intake.setState(Intake.States.ON);
+                    flywheel.setState(Flywheel.States.SPINNING);
+                    intake.setState(Intake.States.SHOOTING);
                     if (gate.doneShooting()){
                         state = States.RESTING;
                     }
@@ -145,7 +157,7 @@ public class RobotBased extends LinearOpMode {
 
             //Overrides
             if (gamepad1.cross) {
-                intake.setState(Intake.States.OUTTAKE);
+                intake.setState(Intake.States.EJECT);
             }
             if (square) {
                 hold = !hold;

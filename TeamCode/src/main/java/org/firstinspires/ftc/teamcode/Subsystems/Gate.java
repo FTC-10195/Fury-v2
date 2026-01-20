@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
+@Config
 public class Gate {
     public enum State{
         CLOSE,
@@ -13,8 +14,8 @@ public class Gate {
         OPEN,
         CLOSING
     }
-    public static double closePos = .5;
-    public static double openPos = .3;
+    public static double closePos = .55;
+    public static double openPos = .66;
     public static long gateWaitTime = 1000;
     public static long gateTransitionTime = 250;
     State currentState = State.CLOSE;

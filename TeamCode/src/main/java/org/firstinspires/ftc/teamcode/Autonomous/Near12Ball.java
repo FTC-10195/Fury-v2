@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
-import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +51,17 @@ public class Near12Ball extends LinearOpMode {
 
     public void buildPaths() {
 
-        final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, Math.toRadians(180)); // Start Pose of our robot.
-        final Pose shootPose = new Pose(calculateX(53.20830181543116), 82.8124054462935, Math.toRadians(180));
-        final Pose intakePose1 = new Pose(calculateX(15.10892586989409), 64.70650529500753, Math.toRadians(180));
+        final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
+        final Pose shootPose = new Pose(calculateX(53.20830181543116), 82.8124054462935, calculateHeading(180));
+        final Pose intakePose1 = new Pose(calculateX(15.10892586989409), 64.70650529500753, calculateHeading(180));
         final Pose intakeControl1 = new Pose(calculateX(44.778129727685325),53.09909228441754);
-        final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, Math.toRadians(180));
+        final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, calculateHeading(180));
         final Pose shootControl2 = new Pose(calculateX(41.81996974281392),62.75869894099847);
-        final Pose intakePose2 = new Pose(calculateX(14.583963691376697), 85.49924357034797, Math.toRadians(180));
+        final Pose intakePose2 = new Pose(calculateX(14.583963691376697), 85.49924357034797, calculateHeading(180));
 
-        final Pose intakePose3 = new Pose(calculateX(14.461422087745841), 38.236006051437215, Math.toRadians(180));
+        final Pose intakePose3 = new Pose(calculateX(14.461422087745841), 38.236006051437215, calculateHeading(180));
         final Pose intakeControl3 = new Pose(calculateX(54.728441754916794), 29.568078668683814);
-        final Pose leavePose = new Pose(calculateX(32.161875945537055),66.82904689863841, Math.toRadians(180));
+        final Pose leavePose = new Pose(calculateX(32.161875945537055),66.82904689863841, calculateHeading(180));
 
 
 
@@ -232,7 +231,7 @@ public class Near12Ball extends LinearOpMode {
                     break;
                 case 2:
                     path += command.runFollow(intakeFirst,2000);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 3:
                     intake.setState(Intake.States.OFF);
@@ -244,7 +243,7 @@ public class Near12Ball extends LinearOpMode {
                     break;
                 case 5:
                     path += command.runFollow(intakeSecond,1500);
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     break;
                 case 6:
                     intake.setState(Intake.States.OFF);
@@ -255,7 +254,7 @@ public class Near12Ball extends LinearOpMode {
                     path += command.runShoot();
                     break;
                 case 8:
-                    intake.setState(Intake.States.ON);
+                    intake.setState(Intake.States.INTAKE);
                     path += command.runFollow(intakeThird,2500);
                     break;
                 case 9:
