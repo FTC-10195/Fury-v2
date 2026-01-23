@@ -51,16 +51,16 @@ public class Near15BallWITHGATE extends LinearOpMode {
     public void buildPaths() {
 
         final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
-        final Pose shootPose = new Pose(calculateX(53.20830181543116), 82.8124054462935, calculateHeading(180));
+        final Pose shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(180));
         final Pose intakePose1 = new Pose(calculateX(14.583963691376697), 64.70650529500753, calculateHeading(180));
         final Pose intakeControl1 = new Pose(calculateX(44.778129727685325),53.09909228441754);
         final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, calculateHeading(180));
         final Pose shootControl2 = new Pose(calculateX(41.81996974281392),62.75869894099847);
-        final Pose intakePose2 = new Pose(calculateX(17.56278366111951), 77.84266263237518, calculateHeading(180));
+        final Pose intakePose2 = new Pose(calculateX(17.56278366111951), 75.84266263237518, calculateHeading(180));
         final Pose intakeControl2 = new Pose(calculateX(54.414523449319205), 93.89409984871406);
 
         final Pose intakePose3 = new Pose(calculateX(14), 38, calculateHeading(180));
-        final Pose intakeControl3 = new Pose(calculateX(54.728441754916794), 29.568078668683814);
+        final Pose intakeControl3 = new Pose(calculateX(74.728441754916794), 20.568078668683814);
         final Pose shootPose3 = new Pose(calculateX(53.5249621785174),79.36308623298032, calculateHeading(180));
         final Pose intakePose4 = new Pose(calculateX(8.084720121028745),9.060514372163404,calculateHeading(180));
         final Pose intakeControl4 = new Pose(calculateX(46.160363086232984),32.1142208774584);
@@ -284,7 +284,7 @@ public class Near15BallWITHGATE extends LinearOpMode {
                 case 9:
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.SPINNING);
-                    path += command.runFollow(shoot4,1000);
+                    path += command.runFollow(shoot4,1200);
                     break;
                 case 10:
                     path += command.runShoot();

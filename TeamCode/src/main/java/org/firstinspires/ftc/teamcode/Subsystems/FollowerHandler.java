@@ -23,7 +23,7 @@ public class FollowerHandler {
     
     public static Pose defaultPose = new Pose(72,72,Math.toRadians(0));
     public static Pose blueHumanPlayer = new Pose(132.89211422087746,10.021180030257188,Math.toRadians(0));
-    public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(0));
+    public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(180));
 
     public static Pose savedPose;
     Follower follower;
@@ -72,6 +72,7 @@ public class FollowerHandler {
            case RED:
                follower.setStartingPose(redHumanPlayer);
                follower.setPose(redHumanPlayer);
+               break;
        }
     }
     public void save(){

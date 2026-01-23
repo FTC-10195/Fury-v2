@@ -28,10 +28,10 @@ public class Flywheel {
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
     public static long waitTime = 1000;
-    public static double farVelocityIncrease = 250;
-    public static double defaultVelocity = 1550;
+    public static double farVelocityIncrease = 300;
+    public static double defaultVelocity = 1075;
     public static double farDistance = 110;
-    public static double passivePower = .08;
+    public static double passivePower = .2;
     public static double kP = 0.001;
     public static double kI = 0;
     public static double kD = 0;
@@ -112,14 +112,19 @@ public class Flywheel {
     public void sub(){
         manualVelocity -= manualVelocity;
     }
+    public double bangBang(){
+        if (currentVelocity > targetVelocity){
+            return 0;
+        }
+        return 1;
+    }
 
     public void update() {
+        targetVelocity = defaultVelocity + manualVelocity;
 
         if (zone == Zone.FAR){
             targetVelocity = defaultVelocity + manualVelocity + farVelocityIncrease;
-            return;
         }
-        targetVelocity = defaultVelocity + manualVelocity;
 
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
         pidfController.setTargetPosition(targetVelocity);
@@ -151,7 +156,10 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || Math.abs(targetVelocity - currentVelocity) < tolerance){
                   isReady = true;
               }
+              power = bangBang();
+
               break;
+
       }
 
         if (Math.abs(power) > maxPower){

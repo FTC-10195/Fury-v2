@@ -74,10 +74,13 @@ public class RobotBased extends LinearOpMode {
             boolean RT = gamepad1.right_trigger > 0.1 && previousGamepad1.right_trigger <= 0.1;
             boolean circle = gamepad1.circle && !previousGamepad1.circle;
             boolean options = gamepad1.options && !previousGamepad1.options;
+            boolean share = gamepad1.share && !previousGamepad1.share;
             boolean up = gamepad1.dpad_up && !previousGamepad1.dpad_up;
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
             previousGamepad1.copy(gamepad1);
-
+            if (share){
+                drivetrain.flipMode();
+            }
             if (triangle){
                 flywheel.on = !flywheel.on;
             }
@@ -124,7 +127,7 @@ public class RobotBased extends LinearOpMode {
                 case INTAKING:
                     intake.setState(Intake.States.INTAKE);
                     flywheel.setState(Flywheel.States.PASSIVE);
-                    lights.setMode(Lights.Mode.INTAKING);
+                   // lights.setMode(Lights.Mode.INTAKING);
                     if (LT) {
                         state = States.RESTING;
                     }
@@ -176,6 +179,7 @@ public class RobotBased extends LinearOpMode {
             turret.setGoal(lights.getTeamColor());
             turret.setPose(followerHandler.getFollower().getPose());
             flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
+            drivetrain.setYaw(followerHandler.getFollower().getHeading());
 
 
        //     limeLight.update(telemetry);

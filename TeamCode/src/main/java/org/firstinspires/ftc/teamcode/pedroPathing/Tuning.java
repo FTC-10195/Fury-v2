@@ -911,6 +911,8 @@ class DriveTuner extends OpMode {
     public void start() {
         follower.deactivateAllPIDFs();
         follower.activateDrive();
+        follower.activateHeading();
+        follower.activateTranslational();
 
         forwards = follower.pathBuilder()
                 .setGlobalDeceleration()

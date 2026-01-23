@@ -17,8 +17,8 @@ public class Turret {
     Servo rightServo; //Dominant
     Servo leftServo;
     public static double startPos = .5;
-    public static double maxDegrees = 315; //-1100 to 110
-    public static double overridePos = .75;
+    public static double maxDegrees = 315;
+    public static double overridePos = .5;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
@@ -98,6 +98,13 @@ public class Turret {
     }
     public void setOverride(double pos){
         overridePos = pos;
+    }
+    public void calculateOverrideAngle(Lights.TeamColors color ,double degrees){
+        //default blue for auto
+        if (color == Lights.TeamColors.RED){
+            degrees = -degrees;
+        }
+        overridePos = degreesToTicks(degrees);
     }
     public void update(){
 

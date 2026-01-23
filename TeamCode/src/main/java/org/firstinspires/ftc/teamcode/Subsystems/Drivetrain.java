@@ -21,8 +21,8 @@ public class Drivetrain {
     public static double blP = 1;
     public static double brP = 1;
     public static double yawOffset = 0;
-    public static double redOffset =0;
-    public static double blueOffset = 180;
+    public static double redOffset =180;
+    public static double blueOffset = 0;
 
     Mode mode = Mode.ROBOT;
 
