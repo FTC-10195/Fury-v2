@@ -16,9 +16,12 @@ public class Turret {
     }
     Servo rightServo; //Dominant
     Servo leftServo;
-    public static double startPos = .5;
+    public static double startPos = .35;
     public static double maxDegrees = 315;
     public static double overridePos = .5;
+    public static double maxPos = .85;
+    public static double minPos = 0;
+
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
@@ -119,11 +122,11 @@ public class Turret {
                 target = overridePos;
                 break;
         }
-        if (target > 1){
-            target = 1;
+        if (target > maxPos){
+            target = maxPos;
         }
-        if (target < 0){
-            target = 0;
+        if (target < minPos){
+            target = minPos;
         }
         rightServo.setPosition(target);
         leftServo.setPosition(target);

@@ -64,8 +64,8 @@ public class Flywheel {
         flywheel2 = hardwareMap.get(DcMotorEx.class, "fly2");
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
        flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
-       flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
+     //  flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+      // flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
@@ -113,7 +113,7 @@ public class Flywheel {
         manualVelocity -= manualVelocity;
     }
     public double bangBang(){
-        if (currentVelocity > targetVelocity){
+        if (Math.abs(currentVelocity) > Math.abs(targetVelocity)){
             return 0;
         }
         return 1;
@@ -165,7 +165,8 @@ public class Flywheel {
         if (Math.abs(power) > maxPower){
             power = Math.signum(power) * maxPower;
         }
-        flywheel.setPower(power * rMod);
+        flywheel.setPower(power *
+                rMod);
         flywheel2.setPower(power * lMod);
     }
     public void status (Telemetry telemetry) {

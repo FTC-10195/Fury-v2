@@ -102,6 +102,7 @@ public class RobotBased extends LinearOpMode {
             if (LB) {
                 state = States.RESTING;
             }
+            
             if (RB){
                 switch (turret.getState()){
                     case RESET:

@@ -16,12 +16,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Autonomous
-public class Near15BallWITHGATE extends LinearOpMode {
-    private static final Logger log = LoggerFactory.getLogger(Near15BallWITHGATE.class);
+public class Near15Ball extends LinearOpMode {
     private Follower follower;
     private Flywheel flywheel = new Flywheel();
     private Intake intake = new Intake();
@@ -38,37 +35,41 @@ public class Near15BallWITHGATE extends LinearOpMode {
         }
         return Math.toRadians(180 - heading);
     }
-    private double calculateX(double x){
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE){
+
+    private double calculateX(double x) {
+        if (lights.getTeamColor() == Lights.TeamColors.BLUE) {
             return x;
         }
         return 144 - x;
     }
 
     PathChain shootPrescore,
-            intakeFirst, shoot2, intakeSecond,shoot3, intakeThird, shoot4, intakeFourth, shoot5, leave;
+            intakeFirst, shoot2, intakeSecond, shoot3, intakeThird, shoot4, intakeFourth, shoot5, leave;
 
     public void buildPaths() {
 
         final Pose startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
         final Pose shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(180));
-        final Pose intakePose1 = new Pose(calculateX(14.583963691376697), 64.70650529500753, calculateHeading(180));
-        final Pose intakeControl1 = new Pose(calculateX(44.778129727685325),53.09909228441754);
-        final Pose shootPose2 = new Pose(calculateX(55.63842662632375), 79.80332829046898, calculateHeading(180));
-        final Pose shootControl2 = new Pose(calculateX(41.81996974281392),62.75869894099847);
-        final Pose intakePose2 = new Pose(calculateX(17.56278366111951), 75.84266263237518, calculateHeading(180));
-        final Pose intakeControl2 = new Pose(calculateX(54.414523449319205), 93.89409984871406);
 
-        final Pose intakePose3 = new Pose(calculateX(14), 38, calculateHeading(180));
-        final Pose intakeControl3 = new Pose(calculateX(74.728441754916794), 20.568078668683814);
-        final Pose shootPose3 = new Pose(calculateX(53.5249621785174),79.36308623298032, calculateHeading(180));
-        final Pose intakePose4 = new Pose(calculateX(8.084720121028745),9.060514372163404,calculateHeading(180));
-        final Pose intakeControl4 = new Pose(calculateX(46.160363086232984),32.1142208774584);
-
-        final Pose leavePose = new Pose(calculateX(32.161875945537055),66.82904689863841, calculateHeading(180));
+        final Pose intakePose1 = new Pose(calculateX(14.662632375189096), 57.08169440242053, calculateHeading(180));
+        final Pose intakeControl1 = new Pose(calculateX(54.778129727685325), 50.70272314674733);
 
 
+        final Pose shootPose2 = new Pose(calculateX(50.627836611195164), 88.95310136157337, calculateHeading(180));
+        final Pose shootControl2 = new Pose(calculateX(54.56429652042359), 58.996217851739765);
 
+        final Pose intakePose2 = new Pose(calculateX(18.95915279878971), 75.85779122541604, calculateHeading(180));
+
+        final Pose shootPose3 = new Pose(calculateX(57.11195158850227), 73.55673222390317, calculateHeading(180));
+
+
+        final Pose intakePose3 = new Pose(calculateX(18.461422087745841), 38.236006051437215, calculateHeading(180));
+        final Pose intakeControl3 = new Pose(calculateX(64.728441754916794), 25.568078668683814);
+
+        final Pose intakePose4 = new Pose(calculateX(14.386384266263238), 10.81694402420574, calculateHeading(180));
+        final Pose intakeControl4 = new Pose(calculateX(46.30786686838125), 31.584720121028724);
+
+        final Pose leavePose = new Pose(calculateX(32.161875945537055), 66.82904689863841, calculateHeading(180));
 
 
         followerHandler.setStartingPose(startPose);
@@ -103,11 +104,11 @@ public class Near15BallWITHGATE extends LinearOpMode {
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
+
         intakeSecond = follower.pathBuilder()
                 .addPath(
-                        new BezierCurve(
+                        new BezierLine(
                                 shootPose2,
-                                intakeControl2,
                                 intakePose2
                         )
                 )
@@ -136,15 +137,16 @@ public class Near15BallWITHGATE extends LinearOpMode {
                 .addPath(
                         new BezierLine(
                                 intakePose3,
-                                shootPose2
+                                shootPose3
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
-         intakeFourth = follower.pathBuilder()
+
+        intakeFourth = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                shootPose2,
+                                shootPose3,
                                 intakeControl4,
                                 intakePose4
                         )
@@ -155,15 +157,16 @@ public class Near15BallWITHGATE extends LinearOpMode {
                 .addPath(
                         new BezierLine(
                                 intakePose4,
-                                shootPose2
+                                shootPose3
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
+
         leave = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
-                                shootPose2,
+                                shootPose3,
                                 leavePose
                         )
                 )
@@ -191,19 +194,20 @@ public class Near15BallWITHGATE extends LinearOpMode {
         //Chamber
         boolean initial = true;
         while (!opModeIsActive() && !isStopRequested()) {
-            if (initial){
+            if (initial) {
                 turret.setState(Turret.States.RESET);
                 initial = false;
             }
             boolean options = gamepad1.options && !previousGamepad1.options;
+            boolean triangle = gamepad1.triangle && !previousGamepad1.triangle;
             boolean rb = gamepad1.right_bumper && !previousGamepad1.right_bumper;
             previousGamepad1.copy(gamepad1);
 
-            if (options) {
+            if (options || triangle) {
                 lights.switchTeamColor();
                 buildPaths();
             }
-            if (rb){
+            if (rb) {
                 buildPaths();
             }
 
@@ -246,66 +250,64 @@ public class Near15BallWITHGATE extends LinearOpMode {
 
             switch (path) {
                 case 0:
-                    turret.setState(Turret.States.AIM);
-                    path += command.runFollow(shootPrescore, 1000);
+                //    turret.setState(Turret.States.MANUAL);
+                    turret.calculateOverrideAngle(lights.getTeamColor(), -45);
+                    path += command.runFollow(shootPrescore, 1700);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:
                     path += command.runShoot();
                     break;
                 case 2:
-                    path += command.runFollow(intakeFirst,2000);
+                    path += command.runFollow(intakeFirst, 1900);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 3:
+                    path += command.runFollow(shoot2, 1700);
                     intake.setState(Intake.States.OFF);
-                    path += command.runFollow(shoot2,900);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 4:
                     path += command.runShoot();
                     break;
                 case 5:
-                    path += command.runFollow(intakeSecond,2000);
+                    path += command.runFollow(intakeSecond, 1700);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 6:
+                    path += command.runFollow(shoot3, 1500);
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.SPINNING);
-                    path += command.runFollow(shoot3,1000);
                     break;
                 case 7:
                     path += command.runShoot();
                     break;
                 case 8:
-                    path += command.runFollow(intakeThird,2500);
+                    path += command.runFollow(intakeThird, 2500);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 9:
+                    path += command.runFollow(shoot4, 2000);
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.SPINNING);
-                    path += command.runFollow(shoot4,1200);
                     break;
                 case 10:
                     path += command.runShoot();
                     break;
                 case 11:
-                    path += command.runFollow(intakeFourth,2500);
+                    path += command.runFollow(intakeFourth, 3500);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 12:
+                    path += command.runFollow(shoot5, 2500);
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.SPINNING);
-                    path += command.runFollow(shoot5,2000);
                     break;
                 case 13:
                     path += command.runShoot();
                     break;
                 case 14:
-                    path += command.runFollow(leave,1500);
-                    intake.setState(Intake.States.OFF);
-                    break;
-                case 15:
+                    path += command.runFollow(leave,1000);
                     break;
 
 
