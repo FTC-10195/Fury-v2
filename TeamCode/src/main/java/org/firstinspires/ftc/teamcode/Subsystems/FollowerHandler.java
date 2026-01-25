@@ -24,7 +24,6 @@ public class FollowerHandler {
     public static Pose defaultPose = new Pose(72,72,Math.toRadians(0));
     public static Pose blueHumanPlayer = new Pose(132.89211422087746,10.021180030257188,Math.toRadians(0));
     public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(180));
-
     public static Pose savedPose;
     Follower follower;
 
@@ -115,7 +114,28 @@ public class FollowerHandler {
                 .translationalPIDFCoefficients(new PIDFCoefficients(pathingPTranslational,0,pathingDTranslational,0.01)));
         follower.updateConstants();
     }
+
+    private double vX = 0;
+    private double vY = 0;
+    private double prevXPos = 0;
+    private double prevYPos = 0;
+    private double deltaX = 0;
+    private double deltaY = 0;
+    private long prevTime = 0;
+    private long deltaT = System.currentTimeMillis();
+
     public void update(){
+        deltaX = follower.getPose().getX() - prevXPos;
+        deltaY = follower.getPose().getY() - prevYPos;
+        deltaT = (System.currentTimeMillis() - prevTime) * 1000;
+
+        prevXPos = follower.getPose().getX();
+        prevYPos = follower.getPose().getY();
+        prevTime = System.currentTimeMillis();
+
+        vX = deltaX/deltaT;
+        vY = deltaY/deltaT;
+
         follower.update();
     }
     public void status(Telemetry telemetry){
@@ -127,5 +147,20 @@ public class FollowerHandler {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", follower.getPose().getHeading());
+
+        telemetry.addData("DeltaX",deltaX);
+        telemetry.addData("DeltaY",deltaY);
+        telemetry.addData("DeltaT",deltaT);
+        telemetry.addData("vX",vX);
+        telemetry.addData("vY",vY);
+        telemetry.addData("velocityX",follower.getVelocity().getXComponent());
+        telemetry.addData("velocityY",follower.getVelocity().getYComponent());
     }
+    public double getVX(){
+        return vX;
+    }
+    public double getVY(){
+        return vY;
+    }
+
 }

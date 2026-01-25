@@ -28,15 +28,15 @@ public class Flywheel {
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
     public static long waitTime = 1000;
-    public static double farVelocityIncrease = 300;
-    public static double defaultVelocity = 1075;
+    public static double farVelocityIncrease = 350;
+    public static double defaultVelocity = 1150;
     public static double farDistance = 110;
-    public static double passivePower = .2;
-    public static double kP = 0.001;
+    public static double passivePower = .25;
+    public static double kP = 0.00055;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00042;
-    public static double tolerance = 100;
+    public static double kF = 0.00055;
+    public static double tolerance = 150;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
     public static double rMod = -1;
@@ -156,7 +156,7 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || Math.abs(targetVelocity - currentVelocity) < tolerance){
                   isReady = true;
               }
-              power = bangBang();
+           //   power = bangBang();
 
               break;
 
