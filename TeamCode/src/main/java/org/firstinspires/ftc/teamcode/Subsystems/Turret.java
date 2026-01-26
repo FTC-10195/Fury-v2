@@ -21,7 +21,7 @@ public class Turret {
     public static double overridePos = .5;
     public static double maxPos = 1;
     public static double minPos = 0;
-
+    public boolean shootWhileMoving = true;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
@@ -38,15 +38,18 @@ public class Turret {
     private double deltaY = 0;
     private double theta = 0;
 
+    FollowerHandler followerHandler;
+    Pose targetPose; //Calculated TargetPose for shooting while moving
+
+    public void setFollowerHandler(FollowerHandler followerHandler){
+        this.followerHandler = followerHandler;
+    }
 
     public States getState(){
         return state;
     }
     public void setState(States state){
         this.state = state;
-    }
-    public void setPose(Pose pose){
-        robotPose = pose;
     }
     public void setGoal(Lights.TeamColors teamColor){
         switch (teamColor){
@@ -73,8 +76,8 @@ public class Turret {
     double turretAngle;
     public double calculateHeading(){
         //RADIANS
-        deltaX = goal.getX() - robotPose.getX();
-        deltaY = goal.getY() - robotPose.getY();
+        deltaX = targetPose.getX() - robotPose.getX();
+        deltaY = targetPose.getY() - robotPose.getY();
         theta = Math.atan2(deltaY,deltaX);
         turretAngle = theta - robotPose.getHeading();
         if (turretAngle > Math.PI){
@@ -98,6 +101,7 @@ public class Turret {
         telemetry.addData("Theta Degrees", Math.toDegrees(theta));
         telemetry.addData("Robot heading degrees", Math.toDegrees(robotPose.getHeading()));
         telemetry.addData("Turret Degrees", Math.toDegrees(calculateHeading()));
+        ShootingWhileMoving.status(telemetry);
     }
     public void setOverride(double pos){
         overridePos = pos;
@@ -110,6 +114,15 @@ public class Turret {
         overridePos = degreesToTicks(degrees);
     }
     public void update(){
+        if (followerHandler == null){
+            return;
+        }
+
+        targetPose = goal;
+        robotPose = followerHandler.getFollower().getPose();
+        if (shootWhileMoving){
+            targetPose = ShootingWhileMoving.calculateAimPose(goal,followerHandler);
+        }
 
         switch (state){
             case RESET:
@@ -132,4 +145,7 @@ public class Turret {
         leftServo.setPosition(target);
 
     }
+
+
+
 }

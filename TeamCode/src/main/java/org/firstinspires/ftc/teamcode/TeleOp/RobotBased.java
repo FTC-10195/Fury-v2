@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
@@ -178,8 +177,9 @@ public class RobotBased extends LinearOpMode {
 
         //    lights.setMotif(limeLight.getMotif());
             turret.setGoal(lights.getTeamColor());
-            turret.setPose(followerHandler.getFollower().getPose());
+            turret.setFollowerHandler(followerHandler);
             flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
+            intake.setZone(flywheel.getZone());
             drivetrain.setYaw(followerHandler.getFollower().getHeading());
 
 
@@ -209,6 +209,8 @@ public class RobotBased extends LinearOpMode {
 
             flywheel.status(telemetry);
             turret.status(telemetry);
+            followerHandler.status(telemetry);
+            intake.update();
             telemetry.update();
 
       //      limeLight.ftcDashUpdate(telemetryPacket);

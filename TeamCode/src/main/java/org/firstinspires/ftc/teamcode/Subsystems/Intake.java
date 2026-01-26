@@ -7,11 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Config
 public class Intake {
     public enum States {
         INTAKE,
-        PREPARING_TO_FIRE,
         SHOOTING,
         OFF,
         EJECT,
@@ -19,12 +20,17 @@ public class Intake {
 
 
     public States currentState = States.OFF;
+    public Flywheel.Zone zone = Flywheel.Zone.NEAR;
     public static double intakePower = 1;
+    public static double farZonePower = 0.8;
     public static double ejectPower = -1;
 
 
     public void setState(States newStates){
         currentState = newStates;
+    }
+    public void setZone(Flywheel.Zone zone){
+        this.zone = zone;
     }
 
 
@@ -70,14 +76,19 @@ public class Intake {
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
             case SHOOTING:
-                intakeMotor.setPower(intakePower);
+                if (zone == Flywheel.Zone.NEAR){
+                    intakeMotor.setPower(intakePower);
+                }else{
+                    intakeMotor.setPower(farZonePower);
+                }
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
-            case PREPARING_TO_FIRE:
-                intakeMotor.setPower(intakePower);
-                transferMotor.setPower(0);
-                break;
         }
+    }
+    public void status(Telemetry telemetry){
+        telemetry.addLine("INTAKE ------");
+        telemetry.addData("Power",intakeMotor.getPower());
+        telemetry.addData("State",currentState);
     }
 }
 

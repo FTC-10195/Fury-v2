@@ -122,19 +122,19 @@ public class FollowerHandler {
     private double deltaX = 0;
     private double deltaY = 0;
     private long prevTime = 0;
-    private long deltaT = System.currentTimeMillis();
+    private double deltaT = System.currentTimeMillis();
 
     public void update(){
         deltaX = follower.getPose().getX() - prevXPos;
         deltaY = follower.getPose().getY() - prevYPos;
-        deltaT = (System.currentTimeMillis() - prevTime) * 1000;
+        deltaT = (System.currentTimeMillis() - prevTime) / 1000.00;
 
         prevXPos = follower.getPose().getX();
         prevYPos = follower.getPose().getY();
         prevTime = System.currentTimeMillis();
+        vX = deltaX / deltaT;
+        vY = deltaY / deltaT;
 
-        vX = deltaX/deltaT;
-        vY = deltaY/deltaT;
 
         follower.update();
     }

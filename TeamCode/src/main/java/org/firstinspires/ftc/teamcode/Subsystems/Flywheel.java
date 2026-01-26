@@ -106,6 +106,9 @@ public class Flywheel {
         }
         zone = Zone.NEAR;
     }
+    public Zone getZone(){
+        return zone;
+    }
     public void add(){
         manualVelocity += manualVelocityGain;
     }
@@ -156,7 +159,7 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || Math.abs(targetVelocity - currentVelocity) < tolerance){
                   isReady = true;
               }
-           //   power = bangBang();
+              power = bangBang();
 
               break;
 

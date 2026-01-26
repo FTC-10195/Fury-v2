@@ -231,7 +231,7 @@ public class Near15Ball extends LinearOpMode {
 
             followerHandler.update();
             followerHandler.save();
-            turret.setPose(follower.getPose());
+            turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
             turret.update();
 
