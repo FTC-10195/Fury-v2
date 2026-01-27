@@ -12,7 +12,7 @@ public class ShootingWhileMoving {
     public static double distanceNear = 65;
     public static long travelTimeFar = 900;
     public static double distanceFar = 140;
-    public static double turretDampening = 1;
+    public static double turretDampening = 0.6;
 
     //
     static double distance; //Distance from goal (INCH)

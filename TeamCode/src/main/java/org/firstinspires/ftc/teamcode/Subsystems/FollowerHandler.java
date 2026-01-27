@@ -22,8 +22,8 @@ public class FollowerHandler {
     public static double pathingPTranslational = 0.3;
     
     public static Pose defaultPose = new Pose(72,72,Math.toRadians(0));
-    public static Pose blueHumanPlayer = new Pose(132.89211422087746,10.021180030257188,Math.toRadians(0));
-    public static Pose redHumanPlayer = new Pose(11.766546898638428,10.021180030257188,Math.toRadians(180));
+    public static Pose blueHumanPlayer = new Pose(136,8,Math.toRadians(0));
+    public static Pose redHumanPlayer = new Pose(8,8,Math.toRadians(180));
     public static Pose savedPose;
     Follower follower;
 

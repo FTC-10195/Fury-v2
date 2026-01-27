@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp
@@ -51,8 +52,8 @@ public class RobotBased extends LinearOpMode {
         Gate gate = new Gate();
         gate.initiate(hardwareMap);
 
-      //  LimeLight limeLight = new LimeLight();
-     //   limeLight.initiate(hardwareMap);
+        LimeLight limeLight = new LimeLight();
+        limeLight.initiate(hardwareMap);
 
         TelemetryPacket telemetryPacket = new TelemetryPacket(true);
 
@@ -76,9 +77,14 @@ public class RobotBased extends LinearOpMode {
             boolean share = gamepad1.share && !previousGamepad1.share;
             boolean up = gamepad1.dpad_up && !previousGamepad1.dpad_up;
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
+            boolean left = gamepad1.dpad_left && !previousGamepad1.dpad_left;
+
             previousGamepad1.copy(gamepad1);
+
             if (share){
-                drivetrain.flipMode();
+               // drivetrain.flipMode();
+                gamepad1.rumble(1, 10, 100);
+                followerHandler.getFollower().setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
             }
             if (triangle){
                 flywheel.on = !flywheel.on;
@@ -142,7 +148,9 @@ public class RobotBased extends LinearOpMode {
                     }
                     intake.setState(Intake.States.OFF);
                     if (flywheel.isReady) {
-                        gamepad1.rumble(1, 10, 100);
+                        if (flywheel.withinTolerance()) {
+                            gamepad1.rumble(1, 10, 100);
+                        }
                         if (RT) {
                             gate.shoot();
                             state = States.SHOOTING;
@@ -183,7 +191,7 @@ public class RobotBased extends LinearOpMode {
             drivetrain.setYaw(followerHandler.getFollower().getHeading());
 
 
-       //     limeLight.update(telemetry);
+            limeLight.update(telemetry);
 
 
             flywheel.update();

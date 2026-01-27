@@ -23,6 +23,7 @@ public class Intake {
     public Flywheel.Zone zone = Flywheel.Zone.NEAR;
     public static double intakePower = 1;
     public static double farZonePower = 0.8;
+    public static double nearZonePower = 0.8;
     public static double ejectPower = -1;
 
 
@@ -77,7 +78,7 @@ public class Intake {
                 break;
             case SHOOTING:
                 if (zone == Flywheel.Zone.NEAR){
-                    intakeMotor.setPower(intakePower);
+                    intakeMotor.setPower(nearZonePower);
                 }else{
                     intakeMotor.setPower(farZonePower);
                 }

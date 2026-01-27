@@ -250,7 +250,7 @@ public class Near15Ball extends LinearOpMode {
 
             switch (path) {
                 case 0:
-                //    turret.setState(Turret.States.MANUAL);
+                    turret.setState(Turret.States.MANUAL);
                     turret.calculateOverrideAngle(lights.getTeamColor(), -45);
                     path += command.runFollow(shootPrescore, 1700);
                     flywheel.setState(Flywheel.States.SPINNING);
