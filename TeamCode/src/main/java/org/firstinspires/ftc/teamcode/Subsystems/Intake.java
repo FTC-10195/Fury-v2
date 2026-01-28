@@ -22,8 +22,8 @@ public class Intake {
     public States currentState = States.OFF;
     public Flywheel.Zone zone = Flywheel.Zone.NEAR;
     public static double intakePower = 1;
-    public static double farZonePower = 0.8;
-    public static double nearZonePower = 0.8;
+    public static double farZonePower = 1;
+    public static double nearZonePower = 1;
     public static double ejectPower = -1;
 
 

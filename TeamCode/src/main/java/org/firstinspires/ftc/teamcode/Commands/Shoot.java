@@ -26,6 +26,7 @@ public class Shoot {
         }
         if (gate.getState() == Gate.State.OPEN){
             intake.setState(Intake.States.INTAKE);
+            flywheel.spike = true;
             return 0;
         }
         if (gate.getState() == Gate.State.CLOSING || gate.getState() == Gate.State.CLOSE){
@@ -33,6 +34,7 @@ public class Shoot {
             initial = true;
             done = true;
             flywheel.setState(Flywheel.States.PASSIVE);
+            flywheel.spike = false;
             return 1;
         }
         return 0;

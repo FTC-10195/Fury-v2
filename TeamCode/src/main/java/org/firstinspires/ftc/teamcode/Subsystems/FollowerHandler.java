@@ -84,7 +84,7 @@ public class FollowerHandler {
         }
         follower.setPose(savedPose);
     }
-    public void reset(){
+    public void reset() {
         saved = false;
     }
 

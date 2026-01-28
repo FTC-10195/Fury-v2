@@ -66,7 +66,7 @@ public class Near15Ball extends LinearOpMode {
         final Pose intakePose3 = new Pose(calculateX(18.461422087745841), 38.236006051437215, calculateHeading(180));
         final Pose intakeControl3 = new Pose(calculateX(64.728441754916794), 25.568078668683814);
 
-        final Pose intakePose4 = new Pose(calculateX(14.386384266263238), 10.81694402420574, calculateHeading(180));
+        final Pose intakePose4 = new Pose(calculateX(14.386384266263238), 9.81694402420574, calculateHeading(180));
         final Pose intakeControl4 = new Pose(calculateX(46.30786686838125), 31.584720121028724);
 
         final Pose leavePose = new Pose(calculateX(32.161875945537055), 66.82904689863841, calculateHeading(180));
@@ -231,6 +231,7 @@ public class Near15Ball extends LinearOpMode {
 
             followerHandler.update();
             followerHandler.save();
+            flywheel.calculateZone(followerHandler.getFollower().getPose(), lights.getTeamColor());
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
             turret.update();
@@ -251,8 +252,8 @@ public class Near15Ball extends LinearOpMode {
             switch (path) {
                 case 0:
                     turret.setState(Turret.States.MANUAL);
-                    turret.calculateOverrideAngle(lights.getTeamColor(), -45);
-                    path += command.runFollow(shootPrescore, 1700);
+                    turret.calculateOverrideAngle(lights.getTeamColor(), -50);
+                    path += command.runFollow(shootPrescore, 2200);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:

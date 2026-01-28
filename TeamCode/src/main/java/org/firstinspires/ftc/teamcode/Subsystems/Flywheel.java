@@ -28,21 +28,26 @@ public class Flywheel {
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
     public static long waitTime = 1000;
-    public static double farVelocityIncrease = 300;
+    public static double farVelocity = 1180;
     public static double defaultVelocity = 1050;
-    public static double farDistance = 110;
+    public static double nearDistance = 110;
+    public static double farDistance = 125;
+
+    public static double nearTestDistance = 95;
+    public static double farTestDistance = 140;
     public static double passivePower = .25;
-    public static double kP = 0.00055;
+    public static double kP = 0.00053;
     public static double kI = 0;
     public static double kD = 0;
     public static double kF = 0.00055;
-    public static double tolerance = 150;
+    public static double tolerance = 75;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
     public static double rMod = -1;
     public static double lMod = 1;
     private double targetVelocity = defaultVelocity;
     private double manualVelocity = 0;
+    public boolean spike = false;
 
     Timer overideTimer = new Timer();
 
@@ -121,15 +126,25 @@ public class Flywheel {
         }
         return 1;
     }
+    public double spike(){
+        if (spike){
+            return 1;
+        }
+        return power;
+    }
     public boolean withinTolerance(){
         return Math.abs(targetVelocity - currentVelocity) < tolerance;
     }
 
     public void update() {
-        targetVelocity = defaultVelocity + manualVelocity;
+        //Linear Interpolation for flywheel
+        targetVelocity = defaultVelocity + (((farVelocity - defaultVelocity)/(farTestDistance - nearTestDistance)) * (distance - nearTestDistance));
 
-        if (zone == Zone.FAR){
-            targetVelocity = defaultVelocity + manualVelocity + farVelocityIncrease;
+        if (distance < nearDistance){
+            targetVelocity = defaultVelocity + manualVelocity;
+        }
+        if (distance > farDistance){
+            targetVelocity = farVelocity + manualVelocity;
         }
 
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
@@ -151,6 +166,7 @@ public class Flywheel {
       switch (getState()){
           case PASSIVE:
               power = passivePower;
+              spike = false;
               if (!on){
                   power = 0;
               }
@@ -162,8 +178,8 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || withinTolerance()){
                   isReady = true;
               }
-              power = bangBang();
-
+              //power = bangBang();
+              power = spike();
               break;
 
       }

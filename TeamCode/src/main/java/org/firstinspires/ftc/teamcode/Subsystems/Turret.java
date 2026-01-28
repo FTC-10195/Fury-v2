@@ -17,9 +17,9 @@ public class Turret {
     Servo rightServo; //Dominant
     Servo leftServo;
     public static double startPos = .5;
-    public static double maxDegrees = 315;
+    public static double maxDegrees = 320;
     public static double overridePos = .5;
-    public static double maxPos = 1;
+    public static double maxPos = .85;
     public static double minPos = 0;
     public boolean shootWhileMoving = true;
     public static double degreesToTicks(double degrees){

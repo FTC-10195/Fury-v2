@@ -81,7 +81,7 @@ public class RobotBased extends LinearOpMode {
 
             previousGamepad1.copy(gamepad1);
 
-            if (share){
+            if (circle){
                // drivetrain.flipMode();
                 gamepad1.rumble(1, 10, 100);
                 followerHandler.getFollower().setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
@@ -89,7 +89,7 @@ public class RobotBased extends LinearOpMode {
             if (triangle){
                 flywheel.on = !flywheel.on;
             }
-            if (circle){
+            if (share){
                 followerHandler.forceRelocalize(lights.getTeamColor());
                 gamepad1.rumble(1, 10, 100);
             }
@@ -121,6 +121,7 @@ public class RobotBased extends LinearOpMode {
             }
             switch (state) {
                 case RESTING:
+                    flywheel.spike = false;
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.PASSIVE);
                     if (LT) {
@@ -131,6 +132,7 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case INTAKING:
+                    flywheel.spike = false;
                     intake.setState(Intake.States.INTAKE);
                     flywheel.setState(Flywheel.States.PASSIVE);
                    // lights.setMode(Lights.Mode.INTAKING);
@@ -142,6 +144,7 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case PREPARING_TO_FIRE:
+                    flywheel.spike = false;
                     flywheel.setState(Flywheel.States.SPINNING);
                     if (LT) {
                         state = States.INTAKING;
@@ -160,6 +163,7 @@ public class RobotBased extends LinearOpMode {
                 case SHOOTING:
                     flywheel.setState(Flywheel.States.SPINNING);
                     intake.setState(Intake.States.SHOOTING);
+                    flywheel.spike = true;
                     if (gate.doneShooting()){
                         state = States.RESTING;
                     }
