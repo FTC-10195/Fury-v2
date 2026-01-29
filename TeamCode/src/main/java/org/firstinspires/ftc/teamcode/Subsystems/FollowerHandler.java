@@ -82,6 +82,7 @@ public class FollowerHandler {
         if (savedPose == null || !saved){
             savedPose = defaultPose;
         }
+        follower.setStartingPose(savedPose);
         follower.setPose(savedPose);
     }
     public void reset() {
@@ -147,6 +148,11 @@ public class FollowerHandler {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", follower.getPose().getHeading());
+
+        telemetry.addData("Saved",saved);
+        if (savedPose != null) {
+            telemetry.addData("saved pose", savedPose);
+        }
 
         telemetry.addData("DeltaX",deltaX);
         telemetry.addData("DeltaY",deltaY);

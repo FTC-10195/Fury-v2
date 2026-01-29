@@ -16,12 +16,13 @@ public class Turret {
     }
     Servo rightServo; //Dominant
     Servo leftServo;
+    public boolean on = true;
     public static double startPos = .5;
-    public static double maxDegrees = 320;
+    public static double maxDegrees = 330;
     public static double overridePos = .5;
     public static double maxPos = .85;
     public static double minPos = 0;
-    public boolean shootWhileMoving = true;
+    public boolean shootWhileMoving = false;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
@@ -29,7 +30,7 @@ public class Turret {
     public static Pose blueGoal = new Pose(0,144);
     private Pose goal = redGoal;
     private Pose robotPose = new Pose(0,0,Math.toRadians(0));
-    private double target = 0;
+    private double target = startPos;
     private States state = States.RESET;
 
 
@@ -98,6 +99,7 @@ public class Turret {
         telemetry.addData("turret state", state);
         telemetry.addData("Delta X", deltaX);
         telemetry.addData("Delta Y",deltaY);
+        telemetry.addData("On",on);
         telemetry.addData("Theta Degrees", Math.toDegrees(theta));
         telemetry.addData("Robot heading degrees", Math.toDegrees(robotPose.getHeading()));
         telemetry.addData("Turret Degrees", Math.toDegrees(calculateHeading()));
@@ -140,6 +142,9 @@ public class Turret {
         }
         if (target < minPos){
             target = minPos;
+        }
+        if (!on){
+            target = startPos;
         }
         rightServo.setPosition(target);
         leftServo.setPosition(target);

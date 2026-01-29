@@ -8,7 +8,6 @@ import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -36,10 +35,11 @@ public class Flywheel {
     public static double nearTestDistance = 95;
     public static double farTestDistance = 140;
     public static double passivePower = .25;
-    public static double kP = 0.00053;
+    public static double autoPassivePower = .35;
+    public static double kP = 0.00044;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00055;
+    public static double kF = 0.00045;
     public static double tolerance = 75;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
@@ -47,7 +47,8 @@ public class Flywheel {
     public static double lMod = 1;
     private double targetVelocity = defaultVelocity;
     private double manualVelocity = 0;
-    public boolean spike = false;
+    public boolean shooting = false;
+    public boolean auto = false;
 
     Timer overideTimer = new Timer();
 
@@ -118,16 +119,19 @@ public class Flywheel {
         manualVelocity += manualVelocityGain;
     }
     public void sub(){
-        manualVelocity -= manualVelocity;
+        manualVelocity -= manualVelocityGain;
     }
     public double bangBang(){
+        if (!shooting){
+            return power;
+        }
         if (Math.abs(currentVelocity) > Math.abs(targetVelocity)){
             return 0;
         }
         return 1;
     }
     public double spike(){
-        if (spike){
+        if (shooting){
             return 1;
         }
         return power;
@@ -135,17 +139,14 @@ public class Flywheel {
     public boolean withinTolerance(){
         return Math.abs(targetVelocity - currentVelocity) < tolerance;
     }
+    public double calculateVelocity(){
+            return  (0.0000239364 * Math.pow(distance,4)) - (0.0119308 * Math.pow(distance,3)) + (2.19492 * Math.pow(distance,2)) - (173.19644 * (distance)) + 5994.40024;
+    }
+
 
     public void update() {
-        //Linear Interpolation for flywheel
-        targetVelocity = defaultVelocity + (((farVelocity - defaultVelocity)/(farTestDistance - nearTestDistance)) * (distance - nearTestDistance));
-
-        if (distance < nearDistance){
-            targetVelocity = defaultVelocity + manualVelocity;
-        }
-        if (distance > farDistance){
-            targetVelocity = farVelocity + manualVelocity;
-        }
+        targetVelocity = calculateVelocity() + manualVelocity;
+      //  targetVelocity = defaultVelocity;
 
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
         pidfController.setTargetPosition(targetVelocity);
@@ -166,7 +167,10 @@ public class Flywheel {
       switch (getState()){
           case PASSIVE:
               power = passivePower;
-              spike = false;
+              if (auto){
+                  power = autoPassivePower;
+              }
+              shooting = false;
               if (!on){
                   power = 0;
               }
@@ -178,8 +182,8 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || withinTolerance()){
                   isReady = true;
               }
-              //power = bangBang();
-              power = spike();
+              power = bangBang();
+             // power = spike();
               break;
 
       }

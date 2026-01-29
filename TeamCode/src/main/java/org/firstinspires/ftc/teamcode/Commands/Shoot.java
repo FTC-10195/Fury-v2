@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 @Config
 public class Shoot {
@@ -25,8 +26,8 @@ public class Shoot {
             return 0;
         }
         if (gate.getState() == Gate.State.OPEN){
+            flywheel.shooting = true;
             intake.setState(Intake.States.INTAKE);
-            flywheel.spike = true;
             return 0;
         }
         if (gate.getState() == Gate.State.CLOSING || gate.getState() == Gate.State.CLOSE){
@@ -34,7 +35,7 @@ public class Shoot {
             initial = true;
             done = true;
             flywheel.setState(Flywheel.States.PASSIVE);
-            flywheel.spike = false;
+            flywheel.shooting = false;
             return 1;
         }
         return 0;

@@ -219,6 +219,7 @@ public class Near12Ball extends LinearOpMode {
 
             followerHandler.update();
             followerHandler.save();
+            flywheel.auto = true;
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
             turret.update();

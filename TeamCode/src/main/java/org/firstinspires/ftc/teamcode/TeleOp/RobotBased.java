@@ -109,19 +109,12 @@ public class RobotBased extends LinearOpMode {
             }
             
             if (RB){
-                switch (turret.getState()){
-                    case RESET:
-                        turret.setState(Turret.States.AIM);
-                      //  followerHandler.setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
-                        break;
-                    case AIM:
-                        turret.setState(Turret.States.RESET);
-                        break;
-                }
+                turret.on = !turret.on;
             }
             switch (state) {
                 case RESTING:
-                    flywheel.spike = false;
+                    turret.setState(Turret.States.RESET);
+                    flywheel.shooting = false;
                     intake.setState(Intake.States.OFF);
                     flywheel.setState(Flywheel.States.PASSIVE);
                     if (LT) {
@@ -132,7 +125,8 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case INTAKING:
-                    flywheel.spike = false;
+                    turret.setState(Turret.States.RESET);
+                    flywheel.shooting = false;
                     intake.setState(Intake.States.INTAKE);
                     flywheel.setState(Flywheel.States.PASSIVE);
                    // lights.setMode(Lights.Mode.INTAKING);
@@ -144,7 +138,8 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case PREPARING_TO_FIRE:
-                    flywheel.spike = false;
+                    flywheel.shooting = false;
+                    turret.setState(Turret.States.AIM);
                     flywheel.setState(Flywheel.States.SPINNING);
                     if (LT) {
                         state = States.INTAKING;
@@ -161,9 +156,10 @@ public class RobotBased extends LinearOpMode {
                     }
                     break;
                 case SHOOTING:
+                    turret.setState(Turret.States.AIM);
                     flywheel.setState(Flywheel.States.SPINNING);
                     intake.setState(Intake.States.SHOOTING);
-                    flywheel.spike = true;
+                    flywheel.shooting = true;
                     if (gate.doneShooting()){
                         state = States.RESTING;
                     }

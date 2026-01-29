@@ -16,7 +16,7 @@ public class Gate {
     }
     public static double closePos = .18;
     public static double openPos = .29;
-    public static long gateWaitTime = 1000;
+    public static long gateWaitTime = 800;
     public static long gateTransitionTime = 250;
     State currentState = State.CLOSE;
     Timer timer = new Timer();

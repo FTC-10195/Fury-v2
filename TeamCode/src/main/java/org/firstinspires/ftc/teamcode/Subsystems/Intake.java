@@ -22,7 +22,7 @@ public class Intake {
     public States currentState = States.OFF;
     public Flywheel.Zone zone = Flywheel.Zone.NEAR;
     public static double intakePower = 1;
-    public static double farZonePower = 1;
+    public static double farZonePower = .9; //Spin slightly slower to slow down shooting to allow for flywheel to get back to speed faster
     public static double nearZonePower = 1;
     public static double ejectPower = -1;
 
