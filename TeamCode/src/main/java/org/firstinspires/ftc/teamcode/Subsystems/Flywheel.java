@@ -36,11 +36,11 @@ public class Flywheel {
     public static double farTestDistance = 140;
     public static double passivePower = .25;
     public static double autoPassivePower = .35;
-    public static double kP = 0.00044;
+    public static double kP = 0.00049;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00045;
-    public static double tolerance = 75;
+    public static double kF = 0.00048;
+    public static double tolerance = 50;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
     public static double rMod = -1;
@@ -121,10 +121,16 @@ public class Flywheel {
     public void sub(){
         manualVelocity -= manualVelocityGain;
     }
-    public double bangBang(){
+    public double bangBangCustom(){
         if (!shooting){
             return power;
         }
+        if (Math.abs(currentVelocity) > Math.abs(targetVelocity)){
+            return power;
+        }
+        return 1;
+    }
+    public double bangBang(){
         if (Math.abs(currentVelocity) > Math.abs(targetVelocity)){
             return 0;
         }
@@ -140,7 +146,7 @@ public class Flywheel {
         return Math.abs(targetVelocity - currentVelocity) < tolerance;
     }
     public double calculateVelocity(){
-            return  (0.0000239364 * Math.pow(distance,4)) - (0.0119308 * Math.pow(distance,3)) + (2.19492 * Math.pow(distance,2)) - (173.19644 * (distance)) + 5994.40024;
+            return  (0.000020409 * Math.pow(distance,4)) - (0.0102087 * Math.pow(distance,3)) + (1.90697 * Math.pow(distance,2)) - (153.37581 * (distance)) + 5519.88409;
     }
 
 
@@ -182,7 +188,7 @@ public class Flywheel {
               if (overideTimer.doneWaiting() || withinTolerance()){
                   isReady = true;
               }
-              power = bangBang();
+              power = bangBangCustom();
              // power = spike();
               break;
 

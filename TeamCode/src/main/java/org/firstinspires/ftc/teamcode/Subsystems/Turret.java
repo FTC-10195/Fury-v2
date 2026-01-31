@@ -18,7 +18,7 @@ public class Turret {
     Servo leftServo;
     public boolean on = true;
     public static double startPos = .5;
-    public static double maxDegrees = 330;
+    public static double maxDegrees = 325;
     public static double overridePos = .5;
     public static double maxPos = .85;
     public static double minPos = 0;
@@ -81,6 +81,18 @@ public class Turret {
         deltaY = targetPose.getY() - robotPose.getY();
         theta = Math.atan2(deltaY,deltaX);
         turretAngle = theta - robotPose.getHeading();
+        if (turretAngle > Math.PI){
+            turretAngle = -((2 * Math.PI) - turretAngle);
+        }
+
+        return turretAngle;
+    }
+    public static double calculateHeadingFromPose(Pose targetPose, Pose robotPose){
+        //RADIANS
+        double deltaX = targetPose.getX() - robotPose.getX();
+        double deltaY = targetPose.getY() - robotPose.getY();
+        double theta = Math.atan2(deltaY,deltaX);
+        double turretAngle = theta - robotPose.getHeading();
         if (turretAngle > Math.PI){
             turretAngle = -((2 * Math.PI) - turretAngle);
         }

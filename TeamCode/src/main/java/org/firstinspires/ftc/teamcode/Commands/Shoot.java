@@ -14,7 +14,7 @@ public class Shoot {
     public boolean isDone(){
         return done;
     }
-    public int run(Intake intake, Gate gate, Flywheel flywheel){
+    public int run(Intake intake, Gate gate, Flywheel flywheel, boolean flywheelStaySpinning){
         if (initial) {
             gate.shoot();
             intake.setState(Intake.States.OFF);
@@ -35,10 +35,16 @@ public class Shoot {
             initial = true;
             done = true;
             flywheel.setState(Flywheel.States.PASSIVE);
-            flywheel.shooting = false;
+            if (!flywheelStaySpinning) {
+                flywheel.shooting = false;
+            }
             return 1;
         }
         return 0;
     }
+    public int run(Intake intake, Gate gate, Flywheel flywheel) {
+        return run(intake,gate,flywheel,false);
+    }
+
 
 }

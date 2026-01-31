@@ -36,5 +36,6 @@ public class Command {
     }
     Shoot shoot = new Shoot();
     public int runShoot(){return shoot.run(intake,gate,flywheel);}
+    public int runShoot(boolean flywheelStaySpinning){return shoot.run(intake,gate,flywheel, flywheelStaySpinning);}
 
 }

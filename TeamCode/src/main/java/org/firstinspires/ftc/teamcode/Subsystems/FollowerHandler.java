@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -14,6 +15,8 @@ public class FollowerHandler {
     public static double brakeDTranslational = 0.1;
     public static double brakePHeading = 8;
     public static double brakeDHeading = 1.2;
+    public static double brakePDrive = 3;
+    public static double brakeDDrive = 1;
 
     public static double brakePTranslational = 0.6;
 
@@ -100,6 +103,7 @@ public class FollowerHandler {
     public void setBrakeMode(){
         follower.setConstants( new FollowerConstants()
                 .mass(Constants.followerConstants.getMass())
+                .drivePIDFCoefficients(new FilteredPIDFCoefficients(brakePDrive, 0, brakeDDrive, Constants.followerConstants.getCoefficientsDrivePIDF().T, Constants.followerConstants.getCoefficientsDrivePIDF().F))
                 .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
                 .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
                 .headingPIDFCoefficients(new PIDFCoefficients(brakePHeading,0,brakeDHeading,0.01))
@@ -109,6 +113,7 @@ public class FollowerHandler {
     public void setPathMode(){
         follower.setConstants( new FollowerConstants()
                 .mass(Constants.followerConstants.getMass())
+                .drivePIDFCoefficients(Constants.followerConstants.getCoefficientsDrivePIDF())
                 .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
                 .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
                 .headingPIDFCoefficients(new PIDFCoefficients(pathingPHeading,0,0,0.01))
