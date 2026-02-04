@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Commands.Command;
+import org.firstinspires.ftc.teamcode.Commands.Stopwatch;
 import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Autonomous
-public class Near15BallDoubleGate extends LinearOpMode {
+public class Near18Ball extends LinearOpMode {
     private Follower follower;
     private Flywheel flywheel = new Flywheel();
     private Intake intake = new Intake();
@@ -27,6 +28,7 @@ public class Near15BallDoubleGate extends LinearOpMode {
     private Turret turret = new Turret();
     FollowerHandler followerHandler = new FollowerHandler();
     Command command;
+    Stopwatch stopwatch = new Stopwatch();
     private int path = 0;
 
     private double calculateHeading(double heading) {
@@ -42,32 +44,47 @@ public class Near15BallDoubleGate extends LinearOpMode {
         return 144 - x;
     }
 
-    Pose startPose, shootPose, intakePose1, intakeControl1, shootControlPose, gatePose, bounce,bounceControl,shootControlPose2,intakePose3,leavePose;
-
+    Pose startPose, shootPose, intakeFirstPose, intakeFirstControl1,intakeFirstControl2, shootControlPose, gatePose, intakeSecondPose, gateControl, shootControlPoseThird1,shootControlPoseThird2,intakePose3,intakePose4,leavePose;
 
     PathChain shootPrescore,
-            intakeFirst, shoot2, gateOpen, intakeSecond,shoot3, shoot4, intakeThird, leave;
+            intakeFirst, shoot2, gateOpen, intakeSecond,shoot3, shoot4, intakeThird,intakeFourth,shoot5, leave;
 
     public void buildPaths() {
 
-        startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
-        shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(180));
+        //Linear heading interpolation
+        startPose = new Pose(calculateX(32.27677100494234), 133.02141680395385, calculateHeading(270)); // Start Pose of our robot.
+        shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(225));
 
-        intakePose1 = new Pose(calculateX(14.662632375189096), 57.08169440242053, calculateHeading(180));
-        intakeControl1 = new Pose(calculateX(54.778129727685325),50.70272314674733);
+        //Tangential
+        intakeFirstPose = new Pose(calculateX(12.00494233937396), 56.67380560131796);
+        intakeFirstControl1 = new Pose(calculateX(35.460461285008236),62.4011532125206);
+        intakeFirstControl2 = new Pose(calculateX(21.12438220757825),55.26606260296541);
+
+        //Shoot Tangential Reverse
 
 
-        shootControlPose = new Pose(calculateX(54.56429652042359),64.996217851739765);
 
-        gatePose = new Pose(calculateX(16.036762481089247),62.40816944024204,calculateHeading(180));
-        bounce = new Pose(calculateX(13.45990922844175),52.34039334341905,calculateHeading(167));
-        bounceControl = new Pose(calculateX(26.936686838124047),49.18517397881995,calculateHeading(180));
+        shootControlPose = new Pose(calculateX(37.63957100656236),66.88890453533784);
 
-        shootControlPose2 = new Pose(calculateX(28.21988464447806),49.3018154311649);
+        //Tangential
+        gatePose = new Pose(calculateX(11.95387149917627),64.17133443163098,calculateHeading(155));
+        gateControl = new Pose(calculateX(30.208763757797954),52.538822163014956);
+        //Linear
+        intakeSecondPose = new Pose(calculateX(10.87149917627677),54.13838550247118,calculateHeading(125));
 
-        intakePose3 = new Pose(calculateX(19.656580937972763),84.05295007564294,calculateHeading(180));
+        //Tangential Reverse
+        shootControlPoseThird1 = new Pose(calculateX(35.412223395359725),58.07012364571677);
+       // shootControlPoseThird1 = new Pose(calculateX(42.47812125367933),75.8806673030479);
 
-        leavePose = new Pose(calculateX(39.93948562783662),77.83358547655068,calculateHeading(180));
+        //Tanget
+        intakePose3 = new Pose(calculateX(15.841845140032952),85.500823723229,calculateHeading(180));
+        //Shoot Linear
+
+        //Intake Constant
+        intakePose4 = new Pose(calculateX(23.434925864909406),31.464579901153215,calculateHeading(225));
+
+        //Leave constant
+        leavePose = new Pose(calculateX(39.93948562783662),77.83358547655068,calculateHeading(225));
 
 
 
@@ -84,57 +101,60 @@ public class Near15BallDoubleGate extends LinearOpMode {
                                 shootPose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setLinearHeadingInterpolation(startPose.getHeading(),shootPose.getHeading())
                 .build();
         intakeFirst = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
                                 shootPose,
-                                intakeControl1,
-                                intakePose1
+                                intakeFirstControl1,
+                                intakeFirstControl2,
+                                intakeFirstPose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setGlobalTangentHeadingInterpolation()
                 .build();
         shoot2 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                intakePose1,
+                                intakeFirstPose,
                                 shootControlPose,
                                 shootPose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         gateOpen = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 shootPose,
+                                gateControl,
                                 gatePose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setGlobalTangentHeadingInterpolation()
                 .build();
         intakeSecond = follower.pathBuilder()
                 .addPath(
-                        new BezierCurve(
+                        new BezierLine(
                                 gatePose,
-                                bounceControl,
-                                bounce
+                                intakeSecondPose
                         )
                 )
-                .setLinearHeadingInterpolation(calculateHeading(180),bounce.getHeading())
+                .setLinearHeadingInterpolation(gatePose.getHeading(),intakeSecondPose.getHeading())
                 .build();
         shoot3 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                gatePose,
-                                shootControlPose,
+                                intakeSecondPose,
+                                shootControlPoseThird1,
                                 shootPose
                         )
                 )
-                .setLinearHeadingInterpolation(bounce.getHeading(),calculateHeading(180))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
         intakeThird = follower.pathBuilder()
                 .addPath(
@@ -143,7 +163,7 @@ public class Near15BallDoubleGate extends LinearOpMode {
                                 intakePose3
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setGlobalTangentHeadingInterpolation()
                 .build();
         shoot4 = follower.pathBuilder()
                 .addPath(
@@ -152,9 +172,26 @@ public class Near15BallDoubleGate extends LinearOpMode {
                                 shootPose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setLinearHeadingInterpolation(intakePose3.getHeading(),shootPose.getHeading())
                 .build();
-
+        intakeFourth = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                shootPose,
+                                intakePose4
+                        )
+                )
+                .setGlobalConstantHeadingInterpolation(intakePose4.getHeading())
+                .build();
+        shoot5 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                intakePose4,
+                                shootPose
+                        )
+                )
+                .setGlobalConstantHeadingInterpolation(shootPose.getHeading())
+                .build();
         leave = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
@@ -162,9 +199,11 @@ public class Near15BallDoubleGate extends LinearOpMode {
                                 leavePose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setGlobalConstantHeadingInterpolation(shootPose.getHeading())
                 .build();
     }
+
+    int prevPath = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -225,12 +264,12 @@ public class Near15BallDoubleGate extends LinearOpMode {
             flywheel.auto = true;
             flywheel.calculateZone(shootPose,lights.getTeamColor());
             turret.setFollowerHandler(followerHandler);
-            turret.calculateOverrideAngle(lights.getTeamColor(),-45);
+            turret.calculateOverrideAngle(lights.getTeamColor(),-83);
             turret.setState(Turret.States.MANUAL);
             turret.setGoal(lights.getTeamColor());
             turret.update();
 
-            flywheel.update();
+         //   flywheel.update();
             intake.update();
             lights.update(telemetry);
             lights.save();
@@ -243,71 +282,126 @@ public class Near15BallDoubleGate extends LinearOpMode {
 
             telemetry.update();
 
+            if (path != prevPath){
+                stopwatch.reset();
+            }
+            prevPath = path;
+            stopwatch.run();
+
             switch (path) {
                 case 0:
-                    path += command.runFollow(shootPrescore, 2700);
+                    path += command.runFollow(shootPrescore, 2500);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:
-                    path += command.runShoot(true);
+                    path += command.runShoot();
                     break;
                 case 2:
-                    path += command.runFollow(intakeFirst,1900);
-                    intake.setState(Intake.States.INTAKE);
+                    path += command.runFollow(intakeFirst,1500);
+                    if (stopwatch.getTimePassed() > 800){
+                        intake.setState(Intake.States.INTAKE);
+                    }
+
                     break;
                 case 3:
                     path += command.runFollow(shoot2,1700);
-                    intake.setState(Intake.States.OFF);
+                    if (stopwatch.getTimePassed() > 800){
+                        intake.setState(Intake.States.OFF);
+                    }
                     flywheel.setState(Flywheel.States.SPINNING);
+
+
                     break;
                 case 4:
-                    path += command.runShoot(true);
+                    path += command.runShoot();
                     break;
                 case 5:
                     path += command.runFollow(gateOpen,1600);
+                    if (stopwatch.getTimePassed() > 800){
+                        intake.setState(Intake.States.INTAKE);
+                    }
                     break;
                 case 6:
-                    path += command.runFollow(intakeSecond,2200);
+                    path += command.runFollow(intakeSecond,1800);
                     intake.setState(Intake.States.INTAKE);
+
                     break;
                 case 7:
-                    path += command.runFollow(shoot3,1700);
-                    intake.setState(Intake.States.OFF);
+                    path += command.runFollow(shoot3,1600);
                     flywheel.setState(Flywheel.States.SPINNING);
+                    if (stopwatch.getTimePassed() > 1200) {
+                        intake.setState(Intake.States.OFF);
+                    }else{
+                        intake.setState(Intake.States.INTAKE);
+                    }
                     break;
                 case 8:
-                    path += command.runShoot(true);
+                    path += command.runShoot();
                     break;
                 case 9:
                     path += command.runFollow(gateOpen,1600);
+                    if (stopwatch.getTimePassed() > 800) {
+                        intake.setState(Intake.States.INTAKE);
+                    }
                     break;
                 case 10:
-                    path += command.runFollow(intakeSecond,2200);
+                    path += command.runFollow(intakeSecond,1800);
                     intake.setState(Intake.States.INTAKE);
+
                     break;
                 case 11:
-                    path += command.runFollow(shoot3,1700);
-                    intake.setState(Intake.States.OFF);
+                    path += command.runFollow(shoot3,1600);
+                    if (stopwatch.getTimePassed() > 1200) {
+                        intake.setState(Intake.States.OFF);
+                    }else{
+                        intake.setState(Intake.States.INTAKE);
+                    }
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 12:
-                    path += command.runShoot(true);
+                    path += command.runShoot();
                     break;
                 case 13:
-                    path += command.runFollow(intakeThird,1500);
+                    path += command.runFollow(intakeThird,1300);
                     intake.setState(Intake.States.INTAKE);
+
                     break;
                 case 14:
-                    path += command.runFollow(shoot4,1500);
-                    intake.setState(Intake.States.OFF);
+                    path += command.runFollow(shoot4,1000);
+                    if (stopwatch.getTimePassed() > 300) {
+                        intake.setState(Intake.States.INTAKE);
+                    }
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 15:
-                    path += command.runShoot(true);
+                    path += command.runShoot();
                     break;
                 case 16:
+                    path += command.runFollow(intakeFourth,1800);
+                    if (stopwatch.getTimePassed() > 1200) {
+                        intake.setState(Intake.States.INTAKE);
+                    }
+
+                    break;
+                case 17:
+                    path += command.runFollow(shoot5,1800);
+                    if (stopwatch.getTimePassed() > 800) {
+                        intake.setState(Intake.States.OFF);
+                    }else{
+                        intake.setState(Intake.States.INTAKE);
+                    }
+                    flywheel.setState(Flywheel.States.SPINNING);
+                    break;
+                case 18:
+                    path += command.runShoot();
+                    break;
+                case 19:
                     path += command.runFollow(leave,1000);
                     break;
+
+
+
+
 
 
 

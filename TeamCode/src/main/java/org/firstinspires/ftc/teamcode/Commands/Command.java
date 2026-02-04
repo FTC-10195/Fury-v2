@@ -6,12 +6,15 @@ import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 public class Command {
     Flywheel flywheel;
     Gate gate;
     Intake intake;
     FollowerHandler followerHandler;
+    long timeSnapshot = System.currentTimeMillis();
+    long timePassed = 0;
     public Command(){};
     public Command(Flywheel flywheel, Gate gate, Intake intake, FollowerHandler followerHandler){
         this.flywheel = flywheel;
