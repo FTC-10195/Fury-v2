@@ -51,21 +51,21 @@ public class Near12Manual extends LinearOpMode {
     public void buildPaths() {
 
         startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
-        shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(130));
+        shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(135));
 
         intakePoseFirst1 = new Pose(calculateX(52.81543116490167), 57.45839636913767, calculateHeading(180));
         intakePoseFirst2 = new Pose(calculateX(11.043872919818456), 57.29349470499242, calculateHeading(180));
 
-        gatePose = new Pose(calculateX(17.644478063540095),67.34795763993948,calculateHeading(180));
-        gateControlPose = new Pose(calculateX(33.316944024205746),63.102874432677766);
+        gatePose = new Pose(calculateX(15.644478063540095),67.34795763993948,calculateHeading(180));
+        gateControlPose = new Pose(calculateX(25.16944024205746),63.102874432677766);
 
 
         shootControlPose = new Pose(calculateX(54.56429652042359),64.996217851739765);
 
-        shootControlPose2 = new Pose(calculateX(28.21988464447806),49.3018154311649);
+        shootControlPose2 = new Pose(calculateX(74.0436365355522),45.12027231467473);
 
         intakePoseSecond1 = new Pose(calculateX(44.75945537065052),84.52344931921331,calculateHeading(180));
-        intakePoseSecond2 = new Pose(calculateX(18.844175491679277),84.7912254160363,calculateHeading(180));
+        intakePoseSecond2 = new Pose(calculateX(13.844175491679277),84.7912254160363,calculateHeading(180));
 
         intakePoseThird1 = new Pose(calculateX(53.39183055975795),33.57186081694402,calculateHeading(180));
         intakePoseThird2 = new Pose(calculateX(13.502269288956139),33.534039334341905,calculateHeading(180));
@@ -90,7 +90,7 @@ public class Near12Manual extends LinearOpMode {
                                 shootPose
                         )
                 )
-                .setGlobalConstantHeadingInterpolation(calculateHeading(180))
+                .setLinearHeadingInterpolation(calculateHeading(180),shootPose.getHeading())
                 .build();
         intakeFirst1 = follower.pathBuilder()
                 .addPath(
@@ -122,8 +122,9 @@ public class Near12Manual extends LinearOpMode {
                 .build();
         shoot2 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 gatePose,
+                                shootControlPose2,
                                 shootPose
                         )
                 )
@@ -241,7 +242,6 @@ public class Near12Manual extends LinearOpMode {
             if (dpadUp){
                 flywheel.sub();
             }
-            flywheel.update();
             flywheel.status(telemetry);
             lights.update(telemetry);
             telemetry.update();
@@ -296,15 +296,15 @@ public class Near12Manual extends LinearOpMode {
                     path += command.runFollow(intakeFirst1,1200);
                     break;
                 case 3:
-                    path += command.runFollow(intakeFirst2,1200);
+                    path += command.runFollow(intakeFirst2,1700);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 4:
-                    path += command.runFollow(gateOpen,1200);
+                    path += command.runFollow(gateOpen,2000);
                     intake.setState(Intake.States.OFF);
                     break;
                 case 5:
-                    path += command.runFollow(shoot2, 2000);
+                    path += command.runFollow(shoot2, 2300);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 6:
@@ -333,7 +333,7 @@ public class Near12Manual extends LinearOpMode {
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 13:
-                    path += command.runFollow(shoot4, 3000);
+                    path += command.runFollow(shoot4, 2800);
                     flywheel.setState(Flywheel.States.SPINNING);
                     intake.setState(Intake.States.OFF);
                     break;
