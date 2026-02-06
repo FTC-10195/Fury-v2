@@ -39,7 +39,7 @@ public class SubsystemBased extends LinearOpMode {
 
         if (isStopRequested()) {
             lights.reset();
-            followerHandler.reset();
+            followerHandler.end();
             return;
         }
 
@@ -63,7 +63,7 @@ public class SubsystemBased extends LinearOpMode {
             }
 
             if (square) {
-                followerHandler.flipLock();
+                followerHandler.flipLock(lights);
             }
             if (RB){
                 followerHandler.forceRelocalize(lights.getTeamColor());

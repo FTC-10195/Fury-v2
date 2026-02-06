@@ -29,7 +29,7 @@ public class DrivetrainOnly extends LinearOpMode {
 
         if (isStopRequested()) {
             lights.reset();
-            followerHandler.reset();
+            followerHandler.end();
             return;
         }
 
@@ -52,7 +52,7 @@ public class DrivetrainOnly extends LinearOpMode {
             }
 
             if (square) {
-                followerHandler.flipLock();
+                followerHandler.flipLock(lights);
             }
             if (RB){
                 followerHandler.forceRelocalize(lights.getTeamColor());

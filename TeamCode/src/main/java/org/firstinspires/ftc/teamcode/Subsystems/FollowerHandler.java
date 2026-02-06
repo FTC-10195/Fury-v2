@@ -5,13 +5,27 @@ import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Config
 public class FollowerHandler {
+    public enum State{
+        PARK,
+        BRAKE,
+        RESTING
+    }
+    public State state = State.RESTING;
+    public void setState(State state){
+        this.state = state;
+    }
+    public State getState(){
+        return state;
+    }
     public static double brakeDTranslational = 0.1;
     public static double brakePHeading = 8;
     public static double brakeDHeading = 1.2;
@@ -19,41 +33,76 @@ public class FollowerHandler {
     public static double brakeDDrive = 1;
 
     public static double brakePTranslational = 0.6;
-
-    public static double pathingDTranslational  = 0.1;
-    public static double pathingPHeading = 2.5;
-    public static double pathingPTranslational = 0.3;
     
     public static Pose defaultPose = new Pose(72,72,Math.toRadians(0));
     public static Pose blueHumanPlayer = new Pose(136,8,Math.toRadians(0));
     public static Pose redHumanPlayer = new Pose(8,8,Math.toRadians(180));
+    public static Pose redPark = new Pose(41.682,32.909390444810555,Math.toRadians(180));
+    public static Pose bluePark = new Pose(102.5820428336079,32.909390444810555,Math.toRadians(0));
+
     public static Pose savedPose;
     Follower follower;
 
-    boolean locked = false;
     Pose holdPose;
+    Pose parkPose;
+    PathChain park;
     boolean saved = false;
-    public void lock(){
-        locked = true;
+    public void autoPark(Lights.TeamColors color){
+        state = State.PARK;
+        switch (color){
+            case RED:
+                parkPose = redPark;
+                break;
+            default:
+                parkPose = bluePark;
+                break;
+        }
+        park = follower.pathBuilder().addPath(
+                        new BezierLine(
+                                follower.getPose(),
+                                parkPose
+                        )
+                )
+                .setLinearHeadingInterpolation(follower.getHeading(), parkPose.getHeading())
+                        .build();
+
+
+        setPathMode();
+        follower.updateConstants();
+
+        follower.followPath(park);
+
+    }
+    public void rest(){
+        state = State.RESTING;
+        follower.breakFollowing();
+        setPathMode();
+    }
+    public void flipLock(Lights light){
+       if (state == State.BRAKE){
+           light.setMode(Lights.Mode.TEAM);
+           rest();
+           return;
+       }
+        light.setMode(Lights.Mode.FOLLOWER_MODE);
+        state = State.BRAKE;
         holdPose = follower.getPose();
         setBrakeMode();
 
         follower.updateConstants();
         follower.holdPoint(holdPose);
     }
-    public void unlock(){
-        locked = false;
-        follower.breakFollowing();
-    }
-    public void flipLock(){
-       if (locked){
-           unlock();
-           return;
-       }
-       lock();
+    public void flipPark(Lights light){
+        if (state == State.PARK || state == State.BRAKE){
+            light.setMode(Lights.Mode.TEAM);
+            rest();
+            return;
+        }
+        light.setMode(Lights.Mode.FOLLOWER_MODE);
+        autoPark(light.getTeamColor());
     }
     public boolean isLocked(){
-        return locked;
+    return state == State.BRAKE;
     }
 
     public void initiate(HardwareMap hardwareMap){
@@ -88,7 +137,7 @@ public class FollowerHandler {
         follower.setStartingPose(savedPose);
         follower.setPose(savedPose);
     }
-    public void reset() {
+    public void end() {
         saved = false;
     }
 
@@ -111,13 +160,7 @@ public class FollowerHandler {
         follower.updateConstants();
     }
     public void setPathMode(){
-        follower.setConstants( new FollowerConstants()
-                .mass(Constants.followerConstants.getMass())
-                .drivePIDFCoefficients(Constants.followerConstants.getCoefficientsDrivePIDF())
-                .forwardZeroPowerAcceleration(Constants.followerConstants.getForwardZeroPowerAcceleration())
-                .lateralZeroPowerAcceleration(Constants.followerConstants.getLateralZeroPowerAcceleration())
-                .headingPIDFCoefficients(new PIDFCoefficients(pathingPHeading,0,0,0.01))
-                .translationalPIDFCoefficients(new PIDFCoefficients(pathingPTranslational,0,pathingDTranslational,0.01)));
+        follower.setConstants(Constants.followerConstants);
         follower.updateConstants();
     }
 
@@ -147,7 +190,8 @@ public class FollowerHandler {
     public void status(Telemetry telemetry){
         telemetry.addLine("FOLLOWER HANDLER -----------");
         telemetry.addData("FollowerHandlerPose",follower.getPose());
-        telemetry.addData("Lock", locked);
+        telemetry.addData("State",state);
+        telemetry.addData("Lock", state == State.BRAKE);
         telemetry.addData("HoldPose",holdPose);
 
         telemetry.addData("X", follower.getPose().getX());

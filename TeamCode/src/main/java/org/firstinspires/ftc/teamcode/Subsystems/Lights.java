@@ -17,7 +17,8 @@ public class Lights {
         TEAM,
         MOTIF,
         INTAKING,
-        SUBSYSTEM_BASED
+        OVERRIDE_MODE,
+        FOLLOWER_MODE
     }
 
     static TeamColors savedColor;
@@ -169,8 +170,11 @@ public class Lights {
             case INTAKING:
                 intake();
                 break;
-            case SUBSYSTEM_BASED:
+            case OVERRIDE_MODE:
                 color = yellow;
+                break;
+            case FOLLOWER_MODE:
+                color = green;
                 break;
         }
 

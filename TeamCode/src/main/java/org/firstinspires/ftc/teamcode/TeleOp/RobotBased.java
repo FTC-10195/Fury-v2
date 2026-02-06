@@ -59,11 +59,15 @@ public class RobotBased extends LinearOpMode {
 
         if (isStopRequested()) {
             lights.reset();
-            followerHandler.reset();
+            followerHandler.end();
             return;
         }
 
+        boolean override = false;
+
         Gamepad previousGamepad1 = new Gamepad();
+        Gamepad previousGamepad2 = new Gamepad();
+
         while (opModeIsActive()) {
 
             boolean LB = gamepad1.left_bumper && !previousGamepad1.left_bumper;
@@ -75,19 +79,36 @@ public class RobotBased extends LinearOpMode {
             boolean circle = gamepad1.circle && !previousGamepad1.circle;
             boolean options = gamepad1.options && !previousGamepad1.options;
             boolean share = gamepad1.share && !previousGamepad1.share;
+
             boolean up = gamepad1.dpad_up && !previousGamepad1.dpad_up;
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
             boolean left = gamepad1.dpad_left && !previousGamepad1.dpad_left;
 
-            previousGamepad1.copy(gamepad1);
+            //gamepad 2
+            boolean triangle2 = gamepad2.triangle && !previousGamepad2.triangle; //Turn off flywheel passive
+            boolean square2 = gamepad2.square && !previousGamepad2.square; //Manual mode flywheel
+            boolean circle2 = gamepad2.circle && !previousGamepad2.circle; //Relocalize limelight
+            boolean X2 = gamepad2.cross && !previousGamepad2.cross; //Relocalize limelight
 
-            if (circle){
+
+            boolean RB2 = gamepad2.right_bumper && !previousGamepad2.right_bumper; //Turn off turret
+            boolean up2 = gamepad2.dpad_up && !previousGamepad2.dpad_up; //Increase flywheel manual power
+            boolean down2 = gamepad2.dpad_down && !previousGamepad2.dpad_down; //Decrease flywheel manual power
+
+            previousGamepad1.copy(gamepad1);
+            previousGamepad2.copy(gamepad2);
+
+            if (circle || circle2){
                // drivetrain.flipMode();
                 gamepad1.rumble(1, 10, 100);
                 followerHandler.getFollower().setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
             }
-            if (triangle){
+            if (triangle2){
                 flywheel.on = !flywheel.on;
+            }
+            if (triangle){
+                //auto park
+                followerHandler.flipPark(lights);
             }
             if (share){
                 followerHandler.forceRelocalize(lights.getTeamColor());
@@ -100,6 +121,24 @@ public class RobotBased extends LinearOpMode {
             if (down){
                 flywheel.sub();
             }
+            if (flywheel.manualMode) {
+                override = true;
+                if (up2) {
+                    flywheel.increaseManualPower();
+                }
+                if (down2) {
+                    flywheel.decreaseManualPower();
+                }
+            }else{
+                if (turret.on){
+                    override = false;
+                }else{
+                    override = true;
+                }
+            }
+            if (square2){
+                flywheel.manualMode = !flywheel.manualMode;
+            }
 
             if (options){
                 lights.switchTeamColor();
@@ -108,7 +147,7 @@ public class RobotBased extends LinearOpMode {
                 state = States.RESTING;
             }
             
-            if (RB){
+            if (RB || RB2){
                 turret.on = !turret.on;
             }
             switch (state) {
@@ -171,16 +210,20 @@ public class RobotBased extends LinearOpMode {
                 intake.setState(Intake.States.EJECT);
             }
             if (square) {
-                hold = !hold;
-                if (hold){
-                    holdPose = followerHandler.getFollower().getPose();
-                    followerHandler.setBrakeMode();
-
-                    followerHandler.getFollower().updateConstants();
-                    followerHandler.getFollower().holdPoint(holdPose);
-                }else{
-                    followerHandler.getFollower().breakFollowing();
-                }
+                followerHandler.flipLock(lights);
+            }
+            if (X2){
+                override = false;
+                turret.on = true;
+                flywheel.manualMode = false;
+            }
+            if (override){
+                lights.setMode(Lights.Mode.OVERRIDE_MODE);
+            }else{
+                lights.setMode(Lights.Mode.TEAM);
+            }
+            if (followerHandler.getState() != FollowerHandler.State.RESTING){
+                lights.setMode(Lights.Mode.FOLLOWER_MODE);
             }
 
         //    lights.setMotif(limeLight.getMotif());
@@ -199,7 +242,7 @@ public class RobotBased extends LinearOpMode {
             intake.update();
             gate.update();
             followerHandler.update();
-            if (!hold) {
+            if (followerHandler.getState() == FollowerHandler.State.RESTING) {
                 drivetrain.update(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
 

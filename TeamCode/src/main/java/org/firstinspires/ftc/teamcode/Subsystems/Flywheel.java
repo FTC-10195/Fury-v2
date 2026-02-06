@@ -50,6 +50,10 @@ public class Flywheel {
     private double manualVelocity = 0;
     public boolean shooting = false;
     public boolean auto = false;
+    public boolean manualMode = false;
+    public static double defaultManualPower = 0.6;
+    public static double manualPowerGain = 0.05;
+    private double manualPower = defaultManualPower;
 
     Timer overideTimer = new Timer();
 
@@ -121,6 +125,12 @@ public class Flywheel {
     }
     public void sub(){
         manualVelocity -= manualVelocityGain;
+    }
+    public void increaseManualPower(){
+        manualPower += manualPowerGain;
+    }
+    public void decreaseManualPower(){
+        manualPower -= manualPowerGain;
     }
     public double bangBangCustom(){
         if (!shooting){
@@ -197,6 +207,9 @@ public class Flywheel {
                   isReady = true;
               }
               power = bangBangCustom();
+              if (manualMode){
+                  power = manualPower;
+              }
              // power = spike();
               break;
 
@@ -219,8 +232,13 @@ public class Flywheel {
         telemetry.addData("Pos diff", posDifference);
         telemetry.addData("Flywheel power", power);
         telemetry.addData("flywheelReady",isReady);
+        telemetry.addData("Manual mode",manualMode);
+        telemetry.addData("Manual Power",manualPower);
     }
     public void updateTelemetryPacket(TelemetryPacket telemetryPacket){
+        telemetryPacket.put("Target Velocity ",targetVelocity);
+        telemetryPacket.put("Current Velocity ",currentVelocity);
         telemetryPacket.put("VelocityError",targetVelocity - currentVelocity);
+        telemetryPacket.put("Power",power);
     }
 }
