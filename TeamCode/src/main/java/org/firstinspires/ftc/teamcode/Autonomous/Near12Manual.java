@@ -30,16 +30,10 @@ public class Near12Manual extends LinearOpMode {
     private int path = 0;
 
     private double calculateHeading(double heading) {
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE) {
-            return Math.toRadians(heading);
-        }
-        return Math.toRadians(180 - heading);
+        return AutoPresets.calculateHeading(lights.getTeamColor(),heading);
     }
     private double calculateX(double x){
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE){
-            return x;
-        }
-        return 144 - x;
+        return AutoPresets.calculateX(lights.getTeamColor(),x);
     }
 
     Pose startPose, shootPose, intakePoseFirst1, intakePoseFirst2, shootControlPose, gatePose, gateControlPose,shootControlPose2,intakePoseSecond1,intakePoseSecond2, intakePoseThird1, intakePoseThird2,leavePose;

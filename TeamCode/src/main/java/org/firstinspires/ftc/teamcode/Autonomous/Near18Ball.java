@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Autonomous
+@Config
 public class Near18Ball extends LinearOpMode {
     private Follower follower;
     private Flywheel flywheel = new Flywheel();
@@ -30,18 +32,18 @@ public class Near18Ball extends LinearOpMode {
     Command command;
     Stopwatch stopwatch = new Stopwatch();
     private int path = 0;
-
+    public static double redGateOffsetX = 4; //THIS SHOULD NOT EXIST IDK WHAT IS WRONG WITH RED
     private double calculateHeading(double heading) {
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE) {
-            return Math.toRadians(heading);
-        }
-        return Math.toRadians(180 - heading);
+        return AutoPresets.calculateHeading(lights.getTeamColor(),heading);
     }
     private double calculateX(double x){
+        return AutoPresets.calculateX(lights.getTeamColor(),x);
+    }
+    private double gateCalculate(double x){
         if (lights.getTeamColor() == Lights.TeamColors.BLUE){
             return x;
         }
-        return 144 - x;
+        return calculateX(x) - redGateOffsetX;
     }
 
     Pose startPose, shootPose, intakeFirstPose, intakeFirstControl1,intakeFirstControl2, shootControlPose, gatePose, intakeSecondPose, gateControl, shootControlPoseThird1,shootControlPoseThird2,intakePose3,intakePose4,leavePose;
@@ -67,10 +69,10 @@ public class Near18Ball extends LinearOpMode {
         shootControlPose = new Pose(calculateX(37.63957100656236),66.88890453533784);
 
         //Tangential
-        gatePose = new Pose(calculateX(11.95387149917627),64.17133443163098,calculateHeading(155));
-        gateControl = new Pose(calculateX(30.208763757797954),52.538822163014956);
+        gatePose = new Pose(gateCalculate(11.95387149917627),64.17133443163098,calculateHeading(155));
+        gateControl = new Pose(gateCalculate(30.208763757797954),52.538822163014956);
         //Linear
-        intakeSecondPose = new Pose(calculateX(10.87149917627677),54.13838550247118,calculateHeading(125));
+        intakeSecondPose = new Pose(gateCalculate(10.87149917627677),54.13838550247118,calculateHeading(125));
 
         //Tangential Reverse
         shootControlPoseThird1 = new Pose(calculateX(35.412223395359725),58.07012364571677);
@@ -280,22 +282,22 @@ public class Near18Ball extends LinearOpMode {
 
             switch (path) {
                 case 0:
-                    turret.calculateOverrideAngle(lights.getTeamColor(),-90);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-92);
                     path += command.runFollow(shootPrescore, 2400);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 2:
                     path += command.runFollow(intakeFirst,1400);
-                    if (stopwatch.getTimePassed() > 800){
+                    if (stopwatch.getTimePassed() > 500){
                         intake.setState(Intake.States.INTAKE);
                     }
 
                     break;
                 case 3:
-                    turret.calculateOverrideAngle(lights.getTeamColor(),-93);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-100);
                     path += command.runFollow(shoot2,1900);
                     if (stopwatch.getTimePassed() > 800){
                         intake.setState(Intake.States.OFF);
@@ -305,7 +307,7 @@ public class Near18Ball extends LinearOpMode {
 
                     break;
                 case 4:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 5:
                     path += command.runFollow(gateOpen,1600);
@@ -319,7 +321,7 @@ public class Near18Ball extends LinearOpMode {
 
                     break;
                 case 7:
-                    turret.calculateOverrideAngle(lights.getTeamColor(),-93);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-102);
                     path += command.runFollow(shoot3,1600);
                     flywheel.setState(Flywheel.States.SPINNING);
                     if (stopwatch.getTimePassed() > 1200) {
@@ -329,7 +331,7 @@ public class Near18Ball extends LinearOpMode {
                     }
                     break;
                 case 8:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 9:
                     path += command.runFollow(gateOpen,1600);
@@ -352,7 +354,7 @@ public class Near18Ball extends LinearOpMode {
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 12:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 13:
                     path += command.runFollow(intakeThird,1400);
@@ -360,25 +362,25 @@ public class Near18Ball extends LinearOpMode {
 
                     break;
                 case 14:
-                    turret.calculateOverrideAngle(lights.getTeamColor(),-90);
-                    path += command.runFollow(shoot4,1000);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-97);
+                    path += command.runFollow(shoot4,1200);
                     if (stopwatch.getTimePassed() > 300) {
                         intake.setState(Intake.States.INTAKE);
                     }
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 15:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 16:
                     path += command.runFollow(intakeFourth,2200);
-                    if (stopwatch.getTimePassed() > 1200) {
+                    if (stopwatch.getTimePassed() > 1000) {
                         intake.setState(Intake.States.INTAKE);
                     }
 
                     break;
                 case 17:
-                    turret.calculateOverrideAngle(lights.getTeamColor(),-75);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-77);
                     path += command.runFollow(shoot5,2200);
                     if (stopwatch.getTimePassed() > 800) {
                         intake.setState(Intake.States.OFF);

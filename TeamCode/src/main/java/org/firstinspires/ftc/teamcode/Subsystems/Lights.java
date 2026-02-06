@@ -49,6 +49,7 @@ public class Lights {
 
     public void initiate(HardwareMap hardwareMap) {
         rgbIndicator = hardwareMap.get(Servo.class, "rgb");
+        load();
     }
 
     TeamColors teamColor = TeamColors.RED;
@@ -145,7 +146,6 @@ public class Lights {
 
 
     public void update(Telemetry telemetry) {
-        load();
         telemetry.addLine("LIGHTS -----------");
         telemetry.addData("TeamColor", teamColor);
         telemetry.addData("LightsMode",mode);

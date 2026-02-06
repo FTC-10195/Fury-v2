@@ -30,17 +30,10 @@ public class Near15BallOLD extends LinearOpMode {
     private int path = 0;
 
     private double calculateHeading(double heading) {
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE) {
-            return Math.toRadians(heading);
-        }
-        return Math.toRadians(180 - heading);
+        return AutoPresets.calculateHeading(lights.getTeamColor(),heading);
     }
-
-    private double calculateX(double x) {
-        if (lights.getTeamColor() == Lights.TeamColors.BLUE) {
-            return x;
-        }
-        return 144 - x;
+    private double calculateX(double x){
+        return AutoPresets.calculateX(lights.getTeamColor(),x);
     }
     Pose startPose,shootPose,intakePose1, intakeControl1,shootPose2,shootControl2,intakePose2,shootPose3,intakePose3, intakeControl3,intakePose4,intakeControl4,leavePose;
     PathChain shootPrescore,
@@ -55,12 +48,9 @@ public class Near15BallOLD extends LinearOpMode {
         intakeControl1 = new Pose(calculateX(54.778129727685325), 50.70272314674733);
 
 
-        shootPose2 = new Pose(calculateX(50.627836611195164), 88.95310136157337, calculateHeading(180));
         shootControl2 = new Pose(calculateX(54.56429652042359), 58.996217851739765);
 
         intakePose2 = new Pose(calculateX(18.95915279878971), 73.65779122541604, calculateHeading(180));
-
-        shootPose3 = new Pose(calculateX(57.11195158850227), 73.55673222390317, calculateHeading(180));
 
 
         intakePose3 = new Pose(calculateX(18.461422087745841), 36.236006051437215, calculateHeading(180));
@@ -99,7 +89,7 @@ public class Near15BallOLD extends LinearOpMode {
                         new BezierCurve(
                                 intakePose1,
                                 shootControl2,
-                                shootPose2
+                                shootPose
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
@@ -108,7 +98,7 @@ public class Near15BallOLD extends LinearOpMode {
         intakeSecond = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
-                                shootPose2,
+                                shootPose,
                                 intakePose2
                         )
                 )
@@ -119,7 +109,7 @@ public class Near15BallOLD extends LinearOpMode {
                 .addPath(
                         new BezierLine(
                                 intakePose2,
-                                shootPose3
+                                shootPose
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
@@ -127,7 +117,7 @@ public class Near15BallOLD extends LinearOpMode {
         intakeThird = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                shootPose3,
+                                shootPose,
                                 intakeControl3,
                                 intakePose3
                         )
@@ -138,7 +128,7 @@ public class Near15BallOLD extends LinearOpMode {
                 .addPath(
                         new BezierLine(
                                 intakePose3,
-                                shootPose3
+                                shootPose
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
@@ -147,7 +137,7 @@ public class Near15BallOLD extends LinearOpMode {
         intakeFourth = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                shootPose3,
+                                shootPose,
                                 intakeControl4,
                                 intakePose4
                         )
@@ -158,7 +148,7 @@ public class Near15BallOLD extends LinearOpMode {
                 .addPath(
                         new BezierLine(
                                 intakePose4,
-                                shootPose3
+                                shootPose
                         )
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
@@ -167,7 +157,7 @@ public class Near15BallOLD extends LinearOpMode {
         leave = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
-                                shootPose3,
+                                shootPose,
                                 leavePose
                         )
                 )
@@ -235,11 +225,10 @@ public class Near15BallOLD extends LinearOpMode {
             flywheel.auto = true;
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
-            turret.setState(Turret.States.AIM);
             turret.update();
 
 
-            flywheel.calculateZone(follower.getPose(), lights.getTeamColor());
+            flywheel.calculateZone(shootPose, lights.getTeamColor());
 
 
             flywheel.update();
@@ -258,11 +247,12 @@ public class Near15BallOLD extends LinearOpMode {
             switch (path) {
                 case 0:
                     turret.setState(Turret.States.MANUAL);
+                    turret.calculateOverrideAngle(lights.getTeamColor(),-50);
                     path += command.runFollow(shootPrescore, 2900);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 2:
                     path += command.runFollow(intakeFirst, 1900);
@@ -274,10 +264,10 @@ public class Near15BallOLD extends LinearOpMode {
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 4:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 5:
-                    path += command.runFollow(intakeSecond, 1800);
+                    path += command.runFollow(intakeSecond, 2200,.8);
                     intake.setState(Intake.States.INTAKE);
                     break;
                 case 6:
@@ -286,7 +276,7 @@ public class Near15BallOLD extends LinearOpMode {
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 7:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 8:
                     path += command.runFollow(intakeThird, 2700);
@@ -298,7 +288,7 @@ public class Near15BallOLD extends LinearOpMode {
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 10:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 11:
                     path += command.runFollow(intakeFourth, 3500);
@@ -310,7 +300,7 @@ public class Near15BallOLD extends LinearOpMode {
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 13:
-                    path += command.runShoot();
+                    path += command.runShoot(true);
                     break;
                 case 14:
                     path += command.runFollow(leave,1000);

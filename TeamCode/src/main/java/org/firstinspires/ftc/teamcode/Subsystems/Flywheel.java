@@ -37,7 +37,7 @@ public class Flywheel {
     public static double passivePower = .25;
     public static double autoPassivePower = .35;
     public static double kFDefault = .24;
-    public static double kP = 0.0025;
+    public static double kP = 0.0027;
     public static double kI = 0;
     public static double kD = 0;
     public static double kF = 0.00045;
@@ -161,7 +161,9 @@ public class Flywheel {
     }
     public double calculateVelocity(){
          //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
-        return (3.61531 * distance) + 725.35408;
+        return (3.61531 * distance) + 765.35408;
+       // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
+        //return (3.42442 * distance) +772.86304;
     }
 
 
