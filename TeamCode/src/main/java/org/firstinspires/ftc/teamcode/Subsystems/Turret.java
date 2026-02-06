@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,7 +23,8 @@ public class Turret {
     public static double overridePos = .5;
     public static double maxPos = .85;
     public static double minPos = 0;
-    public boolean shootWhileMoving = false;
+
+    public static boolean shootWhileMoving = false;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }

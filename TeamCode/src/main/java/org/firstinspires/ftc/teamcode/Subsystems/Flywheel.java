@@ -28,7 +28,7 @@ public class Flywheel {
     public static double manualVelocityGain = 50;
     public static long waitTime = 1000;
     public static double farVelocity = 1180;
-    public static double defaultVelocity = 1050;
+    public static double defaultVelocity = 850;
     public static double nearDistance = 110;
     public static double farDistance = 125;
 
@@ -36,10 +36,11 @@ public class Flywheel {
     public static double farTestDistance = 140;
     public static double passivePower = .25;
     public static double autoPassivePower = .35;
-    public static double kP = 0.00049;
+    public static double kFDefault = .24;
+    public static double kP = 0.0025;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00048;
+    public static double kF = 0.00045;
     public static double tolerance = 50;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
@@ -123,6 +124,9 @@ public class Flywheel {
     }
     public double bangBangCustom(){
         if (!shooting){
+            if (targetVelocity - currentVelocity  > 300){
+                return 1;
+            }
             return power;
         }
         if (Math.abs(currentVelocity) > Math.abs(targetVelocity)){
@@ -146,7 +150,8 @@ public class Flywheel {
         return Math.abs(targetVelocity - currentVelocity) < tolerance;
     }
     public double calculateVelocity(){
-            return  (0.000020409 * Math.pow(distance,4)) - (0.0102087 * Math.pow(distance,3)) + (1.90697 * Math.pow(distance,2)) - (153.37581 * (distance)) + 5519.88409;
+         //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
+        return (3.61531 * distance) + 725.35408;
     }
 
 
@@ -168,23 +173,26 @@ public class Flywheel {
         prevPos = flywheel.getCurrentPosition();
 
         currentVelocity = posDifference / (timeDifference) * rMod;
-
+        power = pidfController.run() + (kF * (targetVelocity - defaultVelocity)) + kFDefault;
 
       switch (getState()){
           case PASSIVE:
+
               power = passivePower;
               if (auto){
                   power = autoPassivePower;
               }
+
               shooting = false;
               if (!on){
                   power = 0;
               }
+
+
               isReady = false;
               break;
           case SPINNING:
             //  power = maxPower;
-              power = pidfController.run() + (kF * targetVelocity);
               if (overideTimer.doneWaiting() || withinTolerance()){
                   isReady = true;
               }

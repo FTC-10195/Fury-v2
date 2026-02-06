@@ -14,7 +14,7 @@ public class Gate {
         OPEN,
         CLOSING
     }
-    public static double closePos = .18;
+    public static double closePos = .15;
     public static double openPos = .29;
     public static long gateWaitTime = 800;
     public static long gateTransitionTime = 250;
