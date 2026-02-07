@@ -63,7 +63,6 @@ public class Near15BallOLD extends LinearOpMode {
 
 
         followerHandler.setStartingPose(startPose);
-        followerHandler.save();
 
         shootPrescore = follower.pathBuilder()
                 .addPath(
@@ -221,7 +220,6 @@ public class Near15BallOLD extends LinearOpMode {
             telemetry.addData("Auto path", path);
 
             followerHandler.update();
-            followerHandler.save();
             flywheel.auto = true;
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());

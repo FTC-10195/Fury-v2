@@ -21,20 +21,18 @@ public class Lights {
         FOLLOWER_MODE
     }
 
-    static TeamColors savedColor;
+    static TeamColors savedColor = TeamColors.RED;
+    public static boolean saved = false;
 
     public void save() {
+        saved = true;
         savedColor = teamColor;
     }
 
-    public void load() {
-        if (savedColor != null) {
-            teamColor = savedColor;
-        }
-    }
 
     public void reset() {
-        savedColor = null;
+        savedColor = TeamColors.RED;
+        saved = false;
     }
 
     Servo rgbIndicator;
@@ -47,15 +45,14 @@ public class Lights {
     Timer motifSwitchTimer = new Timer();
 
 
-    public void initiate(HardwareMap hardwareMap) {
-        rgbIndicator = hardwareMap.get(Servo.class, "rgb");
-        load();
-    }
 
     TeamColors teamColor = TeamColors.RED;
     Mode mode = Mode.TEAM;
     int sequence = 0;
     double color = 0;
+    public void initiate(HardwareMap hardwareMap) {
+        rgbIndicator = hardwareMap.get(Servo.class, "rgb");
+    }
     LimeLight.BallColors ball = LimeLight.BallColors.NONE;
     LimeLight.BallColors[] motif = new LimeLight.BallColors[] {LimeLight.BallColors.P, LimeLight.BallColors.P, LimeLight.BallColors.G};
 
@@ -74,6 +71,7 @@ public class Lights {
     }
 
     public void switchTeamColor() {
+        saved = false;
         switch (teamColor) {
             case RED:
                 teamColor = TeamColors.BLUE;
@@ -149,7 +147,12 @@ public class Lights {
         telemetry.addLine("LIGHTS -----------");
         telemetry.addData("TeamColor", teamColor);
         telemetry.addData("LightsMode",mode);
+        telemetry.addData("Saved Color",savedColor);
+        telemetry.addData("Saved",saved);
         rgbIndicator.setPosition(color);
+        if (saved){
+            teamColor = savedColor;
+        }
         switch (mode){
             case TEAM:
             switch (teamColor) {

@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Autonomous
 @Config
-public class Near18Ball extends LinearOpMode {
+public class FarToNear18Ball extends LinearOpMode {
     private Follower follower;
     private Flywheel flywheel = new Flywheel();
     private Intake intake = new Intake();
@@ -54,7 +54,7 @@ public class Near18Ball extends LinearOpMode {
     public void buildPaths() {
 
         //Linear heading interpolation
-        startPose = new Pose(calculateX(32.27677100494234), 133.02141680395385, calculateHeading(270)); // Start Pose of our robot.
+        startPose = new Pose(calculateX(62.00000000000001), 28.70840197693575, calculateHeading(270)); // Start Pose of our robot.
         shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(225));
 
         //Tangential

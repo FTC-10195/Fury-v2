@@ -40,13 +40,13 @@ public class FollowerHandler {
     public static Pose redPark = new Pose(41.682,32.909390444810555,Math.toRadians(180));
     public static Pose bluePark = new Pose(102.5820428336079,32.909390444810555,Math.toRadians(0));
 
-    public static Pose savedPose;
+    public static Pose savedPose = defaultPose;
     Follower follower;
 
     Pose holdPose;
     Pose parkPose;
     PathChain park;
-    boolean saved = false;
+    public static boolean saved = false;
     public void autoPark(Lights.TeamColors color){
         state = State.PARK;
         switch (color){
@@ -104,11 +104,19 @@ public class FollowerHandler {
     public boolean isLocked(){
     return state == State.BRAKE;
     }
+    public void saveLoop(){
+        saved = true;
+        savedPose = follower.getPose();
+    }
 
     public void initiate(HardwareMap hardwareMap){
         follower = Constants.createFollower(hardwareMap);
+        follower.breakFollowing();
         setPathMode();
-        load();
+        if (!saved){
+            savedPose = defaultPose;
+        }
+        setStartingPose(savedPose);
     }
     public void forceRelocalize(Lights.TeamColors teamColor){
        switch (teamColor){
@@ -126,25 +134,18 @@ public class FollowerHandler {
                break;
        }
     }
-    public void save(){
-        saved = true;
-        savedPose = follower.getPose();
-    }
-    public void load(){
-        if (savedPose == null || !saved){
-            savedPose = defaultPose;
-        }
-        follower.setStartingPose(savedPose);
-        follower.setPose(savedPose);
-    }
+
     public void end() {
         saved = false;
+        savedPose = defaultPose;
     }
 
     //For relocalization
     public void setStartingPose(Pose newPose){
         follower.setStartingPose(newPose);
         follower.setPose(newPose);
+        saved = false;
+        savedPose = defaultPose;
     }
     public Follower getFollower(){
         return follower;

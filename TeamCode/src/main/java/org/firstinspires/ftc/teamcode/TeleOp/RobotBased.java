@@ -34,8 +34,6 @@ public class RobotBased extends LinearOpMode {
         waitForStart();
         FollowerHandler followerHandler = new FollowerHandler();
         followerHandler.initiate(hardwareMap);
-        Follower follower = followerHandler.getFollower();
-        follower.setStartingPose(new Pose(72,72));
         Flywheel flywheel = new Flywheel();
         flywheel.initiate(hardwareMap);
         Intake intake = new Intake();

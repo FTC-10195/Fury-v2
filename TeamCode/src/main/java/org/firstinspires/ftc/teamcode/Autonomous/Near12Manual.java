@@ -75,7 +75,6 @@ public class Near12Manual extends LinearOpMode {
 
 
         followerHandler.setStartingPose(startPose);
-        followerHandler.save();
 
         shootPrescore = follower.pathBuilder()
                 .addPath(
@@ -256,7 +255,6 @@ public class Near12Manual extends LinearOpMode {
             telemetry.addData("Auto path", path);
 
             followerHandler.update();
-            followerHandler.save();
             flywheel.auto = true;
             flywheel.calculateZone(shootPose,lights.getTeamColor());
             turret.setFollowerHandler(followerHandler);
