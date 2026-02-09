@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -40,6 +42,10 @@ public class FollowerHandler {
     public static Pose redPark = new Pose(41.682,32.909390444810555,Math.toRadians(180));
     public static Pose bluePark = new Pose(102.5820428336079,32.909390444810555,Math.toRadians(0));
 
+    public static double botWidth = 16;
+    public static double botHeight = 16;
+    public static double pointRadius = 5;
+    public static double fieldHeading = 0;
     public static Pose savedPose = defaultPose;
     Follower follower;
 
@@ -113,9 +119,7 @@ public class FollowerHandler {
         follower = Constants.createFollower(hardwareMap);
         follower.breakFollowing();
         setPathMode();
-        if (!saved){
-            savedPose = defaultPose;
-        }
+        savedPose = defaultPose;
         setStartingPose(savedPose);
     }
     public void forceRelocalize(Lights.TeamColors teamColor){
@@ -211,6 +215,13 @@ public class FollowerHandler {
         telemetry.addData("vY",vY);
         telemetry.addData("velocityX",follower.getVelocity().getXComponent());
         telemetry.addData("velocityY",follower.getVelocity().getYComponent());
+    }
+    public void ftcDashUpdate(TelemetryPacket telemetryPacket, Lights.TeamColors color) {
+        telemetryPacket.put("Robot X",follower.getPose().getX());
+        telemetryPacket.put("Robot Y",follower.getPose().getY());
+        telemetryPacket.put("Robot Heading",follower.getHeading());
+        telemetryPacket.put("Distance From Goal",Flywheel.getDistance(follower.getPose(),Turret.getGoal(color)));
+
     }
     public double getVX(){
         return vX;

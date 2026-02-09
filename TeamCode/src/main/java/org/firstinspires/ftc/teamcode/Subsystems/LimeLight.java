@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
@@ -16,6 +17,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.opencv.core.Mat;
+
+import java.util.ArrayList;
 
 @Config
 public class LimeLight {
@@ -24,10 +28,20 @@ public class LimeLight {
         G,
         NONE
     }
+    public enum Mode{
+        RELOCALIZE,
+        RESTING
+    }
+    Mode mode = Mode.RESTING;
+    public Mode getMode(){
+        return mode;
+    }
 
     public static Pose redGoalPos = new Pose(128.5446293494705, 132.61119515885022, Math.toRadians(40));
     public static Pose blueGoalPos = new Pose(16, 132.61119515885022, Math.toRadians(140));
-
+    public static double distanceThreshold = 4;
+    public static double headingThresholdDegrees = 5;
+    public static int numberOfLocalizationAttempts = 30;
     static BallColors[] motif = {BallColors.P, BallColors.P, BallColors.G};
 
     public BallColors[] getMotif() {
@@ -62,10 +76,15 @@ public class LimeLight {
 
      */
     Pose pedroPose = new Pose(0, 0, 0);
+    Pose relocalizePose = pedroPose;
 
     public boolean canRelocalize = false;
+    public boolean localized = false;
+    int localizeSequence = 0;
     int relocalizingId = 0;
     Limelight3A limelight;
+
+    ArrayList<Pose> relocalizePositions = new ArrayList<>();
 
     public static String ballToString(BallColors color) {
         switch (color) {
@@ -128,10 +147,59 @@ public class LimeLight {
 
         return new Pose(position.x, position.y, Math.toRadians(yaw));
     }
-
+    public Pose findAveragePose(ArrayList<Pose> poses){
+        double averageX = 0;
+        double averageY = 0;
+        double averageHeading = 0;
+        for (int i = 0; i < poses.size(); i++){
+            averageX += poses.get(i).getX();
+            averageY += poses.get(i).getY();
+            averageHeading += poses.get(i).getHeading();
+        }
+        averageX /= poses.size();
+        averageY /= poses.size();
+        averageHeading /= poses.size();
+        return new Pose(averageX,averageY,averageHeading);
+    }
+    public ArrayList<Pose> removeOutliers(ArrayList<Pose> poses){
+       Pose averagePose = findAveragePose(poses);
+        for (int i = 0; i < poses.size(); i++){
+            double distanceX = Math.abs(averagePose.getX() - poses.get(i).getX());
+            if (distanceX > distanceThreshold){
+                poses.remove(i);
+                continue;
+            }
+            double distanceY = Math.abs(averagePose.getY() - poses.get(i).getY());
+            if (distanceY > distanceThreshold){
+                poses.remove(i);
+                continue;
+            }
+            double distanceHeading = Math.toDegrees(Math.abs(averagePose.getHeading() - poses.get(i).getHeading()));
+            if (distanceHeading > headingThresholdDegrees){
+                poses.remove(i);
+                continue;
+            }
+        }
+        return  poses;
+    }
 
     public void update(Telemetry telemetry) {
+        if (localized == true && mode == Mode.RESTING){
+            localized = false;
+        }
+        if (mode == Mode.RELOCALIZE){
+            if (localizeSequence > numberOfLocalizationAttempts){
+                mode = Mode.RESTING;
+                localizeSequence = 0;
+                localized = true;
+                relocalizePose = findAveragePose(removeOutliers(relocalizePositions));
+                relocalizePositions.clear();
 
+            }else{
+                relocalizePositions.add(pedroPose);
+                localizeSequence++;
+            }
+        }
         canRelocalize = false;
         LLResult result = limelight.getLatestResult();
         relocalizingId = 0;
@@ -173,20 +241,27 @@ public class LimeLight {
             telemetry.addData("PoseIn", poseIn);
             telemetry.addData("Pedro Position", pedroPose);
             telemetry.addData("Relocalize Id", relocalizingId);
+            telemetry.addData("Mode",mode);
         }
 
     }
-
-    public Pose relocalize(Pose currentPose) {
-        if (!canRelocalize) {
+    public Pose getPose(Pose currentPose){
+        if (!localized || !canRelocalize){
             return currentPose;
         }
-        return pedroPose;
+        return relocalizePose;
     }
-
-
-    public void ftcDashUpdate(TelemetryPacket telemetryPacket) {
-
+    public void ftcDashUpdate(TelemetryPacket telemetryPacket){
+        telemetryPacket.put("Localized",localized);
+        telemetryPacket.put("Can Relocalize",canRelocalize);
+        telemetryPacket.put("Localize Sequence",localizeSequence);
+        telemetryPacket.put("Relocalize Pose X",relocalizePose.getX());
+        telemetryPacket.put("Relocalize Pose Y",relocalizePose.getY());
+        telemetryPacket.put("Relocalize Pose Heading Degrees",Math.toDegrees(relocalizePose.getHeading()));
+    }
+    public void relocalize(){
+        localizeSequence = 0;
+        mode = Mode.RELOCALIZE;
     }
 
 }

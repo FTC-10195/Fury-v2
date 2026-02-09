@@ -150,9 +150,11 @@ public class Lights {
         telemetry.addData("Saved Color",savedColor);
         telemetry.addData("Saved",saved);
         rgbIndicator.setPosition(color);
-        if (saved){
+      /*  if (saved){
             teamColor = savedColor;
         }
+
+       */
         switch (mode){
             case TEAM:
             switch (teamColor) {

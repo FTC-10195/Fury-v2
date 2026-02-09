@@ -14,8 +14,8 @@ public class Gate {
         OPEN,
         CLOSING
     }
-    public static double closePos = .15;
-    public static double openPos = .29;
+    public static double closePos = .09;
+    public static double openPos = .19;
     public static long gateWaitTime = 800;
     public static long gateTransitionTime = 250;
     State currentState = State.CLOSE;

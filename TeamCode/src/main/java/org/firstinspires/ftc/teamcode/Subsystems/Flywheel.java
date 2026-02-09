@@ -18,16 +18,23 @@ public class Flywheel {
         SPINNING,
         PASSIVE
     }
+    public enum Mode{
+        MANUAL_POWER,
+        NORMAL,
+        MANUAL_VELOCITY
+    }
     public enum Zone{
         FAR,
         NEAR
     }
     public boolean on = true;
     Zone zone = Zone.NEAR;
+    Mode mode = Mode.NORMAL;
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
     public static long waitTime = 1000;
     public static double farVelocity = 1180;
+    public static double nearVelocity = 1050;
     public static double defaultVelocity = 850;
     public static double nearDistance = 110;
     public static double farDistance = 125;
@@ -47,10 +54,9 @@ public class Flywheel {
     public static double rMod = -1;
     public static double lMod = 1;
     private double targetVelocity = defaultVelocity;
-    private double manualVelocity = 0;
+    public double velocityOffset = 0;
     public boolean shooting = false;
     public boolean auto = false;
-    public boolean manualMode = false;
     public static double defaultManualPower = 0.6;
     public static double manualPowerGain = 0.05;
     private double manualPower = defaultManualPower;
@@ -65,7 +71,12 @@ public class Flywheel {
         return currentState;
 
     }
-
+    public Mode getMode(){
+        return mode;
+    }
+    public void setMode(Mode mode){
+        this.mode = mode;
+    }
 
     public States currentState = States.PASSIVE;
     DcMotorEx flywheel;
@@ -104,27 +115,42 @@ public class Flywheel {
     double timeDifference = 0;
     double power = 0;
     static double distance = 0;
+    double manualVelocity = nearVelocity;
+    public static double getDistance(Pose robotPose,Pose goal){
+        double deltaX = goal.getX() - robotPose.getX();
+        double deltaY = goal.getY() - robotPose.getY();
+        return Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
+    }
     public void calculateZone(Pose robotPose, Lights.TeamColors color){
         calculateZone(robotPose,Turret.getGoal(color));
     }
     private void calculateZone(Pose robotPose, Pose goal){
-        double deltaX = goal.getX() - robotPose.getX();
-        double deltaY = goal.getY() - robotPose.getY();
-        distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
+        distance = getDistance(robotPose,goal);
         if (distance > farDistance){
             zone = Zone.FAR;
             return;
         }
         zone = Zone.NEAR;
     }
+    public void setManualVelocity(double v){
+        manualVelocity = v;
+    }
+    public void switchManualVelocity(double v){
+        if (mode != Mode.MANUAL_VELOCITY){
+            mode = Mode.MANUAL_VELOCITY;
+            manualVelocity = v;
+            return;
+        }
+        mode = Mode.NORMAL;
+    }
     public Zone getZone(){
         return zone;
     }
     public void add(){
-        manualVelocity += manualVelocityGain;
+        velocityOffset += manualVelocityGain;
     }
     public void sub(){
-        manualVelocity -= manualVelocityGain;
+        velocityOffset -= manualVelocityGain;
     }
     public void increaseManualPower(){
         manualPower += manualPowerGain;
@@ -161,14 +187,17 @@ public class Flywheel {
     }
     public double calculateVelocity(){
          //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
-        return (3.61531 * distance) + 765.35408;
+        return (3.61531 * distance) + 755.35408;
        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
         //return (3.42442 * distance) +772.86304;
     }
 
 
     public void update() {
-        targetVelocity = calculateVelocity() + manualVelocity;
+        targetVelocity = calculateVelocity() + velocityOffset;
+        if (mode == Mode.MANUAL_VELOCITY){
+            targetVelocity = manualVelocity;
+        }
       //  targetVelocity = defaultVelocity;
 
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
@@ -209,7 +238,7 @@ public class Flywheel {
                   isReady = true;
               }
               power = bangBangCustom();
-              if (manualMode){
+              if (mode == Mode.MANUAL_POWER){
                   power = manualPower;
               }
              // power = spike();
@@ -234,13 +263,13 @@ public class Flywheel {
         telemetry.addData("Pos diff", posDifference);
         telemetry.addData("Flywheel power", power);
         telemetry.addData("flywheelReady",isReady);
-        telemetry.addData("Manual mode",manualMode);
+        telemetry.addData("Mode",mode);
         telemetry.addData("Manual Power",manualPower);
     }
     public void updateTelemetryPacket(TelemetryPacket telemetryPacket){
         telemetryPacket.put("Target Velocity ",targetVelocity);
         telemetryPacket.put("Current Velocity ",currentVelocity);
         telemetryPacket.put("VelocityError",targetVelocity - currentVelocity);
-        telemetryPacket.put("Power",power);
+        telemetryPacket.put("Power",Math.abs(flywheel.getPower()));
     }
 }

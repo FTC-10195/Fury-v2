@@ -81,12 +81,17 @@ public class RobotBased extends LinearOpMode {
             boolean up = gamepad1.dpad_up && !previousGamepad1.dpad_up;
             boolean down = gamepad1.dpad_down && !previousGamepad1.dpad_down;
             boolean left = gamepad1.dpad_left && !previousGamepad1.dpad_left;
+            boolean right = gamepad1.dpad_right && !previousGamepad1.dpad_right;
+
 
             //gamepad 2
             boolean triangle2 = gamepad2.triangle && !previousGamepad2.triangle; //Turn off flywheel passive
             boolean square2 = gamepad2.square && !previousGamepad2.square; //Manual mode flywheel
             boolean circle2 = gamepad2.circle && !previousGamepad2.circle; //Relocalize limelight
             boolean X2 = gamepad2.cross && !previousGamepad2.cross; //Relocalize limelight
+            boolean left2 = gamepad2.dpad_left && !previousGamepad2.dpad_left;
+            boolean right2 = gamepad2.dpad_right && !previousGamepad2.dpad_right;
+
 
 
             boolean RB2 = gamepad2.right_bumper && !previousGamepad2.right_bumper; //Turn off turret
@@ -99,7 +104,22 @@ public class RobotBased extends LinearOpMode {
             if (circle || circle2){
                // drivetrain.flipMode();
                 gamepad1.rumble(1, 10, 100);
-                followerHandler.getFollower().setPose(limeLight.relocalize(followerHandler.getFollower().getPose()));
+                limeLight.relocalize();
+            }
+            if (left) {
+                flywheel.switchManualVelocity(Flywheel.farVelocity);
+            }
+            if (right){
+                flywheel.switchManualVelocity(Flywheel.nearVelocity);
+            }
+            if (flywheel.getMode() == Flywheel.Mode.MANUAL_VELOCITY){
+                override = true;
+            }
+            if (left2){
+                turret.sub();
+            }
+            if (right2){
+                turret.add();
             }
             if (triangle2){
                 flywheel.on = !flywheel.on;
@@ -119,7 +139,7 @@ public class RobotBased extends LinearOpMode {
             if (down){
                 flywheel.sub();
             }
-            if (flywheel.manualMode) {
+            if (flywheel.getMode() == Flywheel.Mode.MANUAL_POWER) {
                 override = true;
                 if (up2) {
                     flywheel.increaseManualPower();
@@ -135,7 +155,11 @@ public class RobotBased extends LinearOpMode {
                 }
             }
             if (square2){
-                flywheel.manualMode = !flywheel.manualMode;
+                if (flywheel.getMode() != Flywheel.Mode.MANUAL_POWER){
+                    flywheel.setMode(Flywheel.Mode.MANUAL_POWER);
+                }else{
+                    flywheel.setMode(Flywheel.Mode.NORMAL);
+                }
             }
 
             if (options){
@@ -213,7 +237,7 @@ public class RobotBased extends LinearOpMode {
             if (X2){
                 override = false;
                 turret.on = true;
-                flywheel.manualMode = false;
+                flywheel.setMode(Flywheel.Mode.NORMAL);
             }
             if (override){
                 lights.setMode(Lights.Mode.OVERRIDE_MODE);
@@ -232,6 +256,7 @@ public class RobotBased extends LinearOpMode {
             drivetrain.setYaw(followerHandler.getFollower().getHeading());
 
 
+
             limeLight.update(telemetry);
 
 
@@ -244,6 +269,9 @@ public class RobotBased extends LinearOpMode {
                 drivetrain.update(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
 
+            if (limeLight.localized) {
+                followerHandler.setStartingPose(limeLight.getPose(followerHandler.getFollower().getPose()));
+            }
 
 
             telemetry.addData("State", state);
@@ -262,8 +290,9 @@ public class RobotBased extends LinearOpMode {
             intake.update();
             telemetry.update();
 
-      //      limeLight.ftcDashUpdate(telemetryPacket);
+            limeLight.ftcDashUpdate(telemetryPacket);
             flywheel.updateTelemetryPacket(telemetryPacket);
+            followerHandler.ftcDashUpdate(telemetryPacket,lights.getTeamColor());
             FtcDashboard.getInstance().sendTelemetryPacket(telemetryPacket);
 
         }

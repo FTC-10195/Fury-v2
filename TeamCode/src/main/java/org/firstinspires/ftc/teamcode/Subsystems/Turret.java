@@ -19,8 +19,8 @@ public class Turret {
     Servo leftServo;
     public boolean on = true;
     public static double startPos = .5;
-    public static double maxDegrees = 325;
-    public static double overridePos = .5;
+    public static double maxDegrees = 327.27;
+    public static double overridePos = .51;
     public static double maxPos = .85;
     public static double minPos = 0;
 
@@ -30,6 +30,8 @@ public class Turret {
     }
     public static Pose redGoal = new Pose(144,144);
     public static Pose blueGoal = new Pose(0,144);
+    public static double manualGain = .01;
+    public double manualOffset = 0;
     private Pose goal = redGoal;
     private Pose robotPose = new Pose(0,0,Math.toRadians(0));
     private double target = startPos;
@@ -40,6 +42,13 @@ public class Turret {
     private double deltaX = 0;
     private double deltaY = 0;
     private double theta = 0;
+
+    public void add(){
+        manualOffset += manualGain;
+    }
+    public void sub(){
+        manualOffset -= manualGain;
+    }
 
     FollowerHandler followerHandler;
     Pose targetPose; //Calculated TargetPose for shooting while moving
