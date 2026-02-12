@@ -169,6 +169,7 @@ public class Turret {
         if (!on){
             target = startPos;
         }
+        target += manualOffset;
         rightServo.setPosition(target);
         leftServo.setPosition(target);
 
