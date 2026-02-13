@@ -314,13 +314,13 @@ public class Near18Ball extends LinearOpMode {
                     }
                     break;
                 case 6:
-                    path += command.runFollow(intakeSecond,1800);
+                    path += command.runFollow(intakeSecond,1700);
                     intake.setState(Intake.States.INTAKE);
 
                     break;
                 case 7:
                     turret.calculateOverrideAngle(lights.getTeamColor(),-102);
-                    path += command.runFollow(shoot3,1600);
+                    path += command.runFollow(shoot3,1900);
                     flywheel.setState(Flywheel.States.SPINNING);
                     if (stopwatch.getTimePassed() > 1200) {
                         intake.setState(Intake.States.OFF);
@@ -338,12 +338,12 @@ public class Near18Ball extends LinearOpMode {
                     }
                     break;
                 case 10:
-                    path += command.runFollow(intakeSecond,1800);
+                    path += command.runFollow(intakeSecond,1700);
                     intake.setState(Intake.States.INTAKE);
 
                     break;
                 case 11:
-                    path += command.runFollow(shoot3,1600);
+                    path += command.runFollow(shoot3,1900);
                     if (stopwatch.getTimePassed() > 1200) {
                         intake.setState(Intake.States.OFF);
                     }else{

@@ -45,9 +45,9 @@ public class Near12Manual extends LinearOpMode {
     public void buildPaths() {
 
         startPose = new Pose(calculateX(33.34341906202723), 132.393343419062, calculateHeading(180)); // Start Pose of our robot.
-        shootPose = new Pose(calculateX(53.20830181543116), 85.8124054462935, calculateHeading(135));
+        shootPose = new Pose(calculateX(50.20830181543116), 85.8124054462935, calculateHeading(135));
 
-        intakePoseFirst1 = new Pose(calculateX(52.81543116490167), 57.45839636913767, calculateHeading(180));
+        intakePoseFirst1 = new Pose(calculateX(50.81543116490167), 57.45839636913767, calculateHeading(180));
         intakePoseFirst2 = new Pose(calculateX(11.043872919818456), 57.29349470499242, calculateHeading(180));
 
         gatePose = new Pose(calculateX(15.644478063540095),67.34795763993948,calculateHeading(180));
@@ -58,11 +58,11 @@ public class Near12Manual extends LinearOpMode {
 
         shootControlPose2 = new Pose(calculateX(74.0436365355522),45.12027231467473);
 
-        intakePoseSecond1 = new Pose(calculateX(44.75945537065052),84.52344931921331,calculateHeading(180));
+        intakePoseSecond1 = new Pose(calculateX(50.75945537065052),84.52344931921331,calculateHeading(180));
         intakePoseSecond2 = new Pose(calculateX(13.844175491679277),84.7912254160363,calculateHeading(180));
 
-        intakePoseThird1 = new Pose(calculateX(53.39183055975795),33.57186081694402,calculateHeading(180));
-        intakePoseThird2 = new Pose(calculateX(13.502269288956139),33.534039334341905,calculateHeading(180));
+        intakePoseThird1 = new Pose(calculateX(50.39183055975795),36.57186081694402,calculateHeading(180));
+        intakePoseThird2 = new Pose(calculateX(13.502269288956139),36.534039334341905,calculateHeading(180));
 
 
 
