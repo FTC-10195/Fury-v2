@@ -26,7 +26,7 @@ public class Turret {
     public static double maxPos = .85;
     public static double minPos = 0;
 
-    public static boolean shootWhileMoving = false;
+    public static boolean shootWhileMoving = true;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
