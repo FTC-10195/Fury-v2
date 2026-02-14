@@ -293,6 +293,8 @@ public class RobotBased extends LinearOpMode {
             limeLight.ftcDashUpdate(telemetryPacket);
             flywheel.updateTelemetryPacket(telemetryPacket);
             followerHandler.ftcDashUpdate(telemetryPacket,lights.getTeamColor());
+            turret.updateFTCDashboard(telemetryPacket);
+
             FtcDashboard.getInstance().sendTelemetryPacket(telemetryPacket);
 
         }

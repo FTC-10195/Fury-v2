@@ -379,7 +379,7 @@ public class Near18Ball extends LinearOpMode {
                     break;
                 case 17:
                     turret.calculateOverrideAngle(lights.getTeamColor(),-77);
-                    path += command.runFollow(shoot5,2200);
+                    path += command.runFollow(shoot5,2300);
                     if (stopwatch.getTimePassed() > 800) {
                         intake.setState(Intake.States.OFF);
                     }else{

@@ -190,7 +190,11 @@ public class Flywheel {
         //return (3.61531 * distance) + 755.35408;
        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
         //return (3.42442 * distance) +RG772.86304;
-        return (3.73037 * distance) + 765.78184;
+       // return (3.73037 * distance) + 765.78184;
+        if (distance < 70){
+            return 1250;
+        }
+        return (3.64569 * distance)+873.8025;
     }
 
 

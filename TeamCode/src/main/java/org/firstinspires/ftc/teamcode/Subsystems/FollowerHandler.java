@@ -217,6 +217,9 @@ public class FollowerHandler {
         telemetry.addData("velocityY",follower.getVelocity().getYComponent());
     }
     public void ftcDashUpdate(TelemetryPacket telemetryPacket, Lights.TeamColors color) {
+        telemetryPacket.put("X Velocity",vX);
+        telemetryPacket.put("Y Velocity",vY);
+
         telemetryPacket.put("Robot X",follower.getPose().getX());
         telemetryPacket.put("Robot Y",follower.getPose().getY());
         telemetryPacket.put("Robot Heading",follower.getHeading());

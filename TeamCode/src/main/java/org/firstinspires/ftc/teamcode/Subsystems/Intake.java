@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.Sorting.BallDetector;
 
 @Config
 public class Intake {
@@ -37,6 +38,7 @@ public class Intake {
 
     DcMotor intakeMotor;
     DcMotor transferMotor;
+    BallDetector ballDetector = new BallDetector();
     public States getState() {
         return currentState;
     }
@@ -61,6 +63,8 @@ public class Intake {
         intakeMotor = hardwaremap.dcMotor.get("intake");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        ballDetector.initiate(hardwaremap);
     }
     public void update(){
         switch(currentState){

@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Commands.Shoot;
 
 @Config
 public class Turret {
@@ -173,6 +175,9 @@ public class Turret {
         rightServo.setPosition(target);
         leftServo.setPosition(target);
 
+    }
+    public void updateFTCDashboard(TelemetryPacket telemetryPacket){
+        ShootingWhileMoving.updateFTCDashboard(telemetryPacket);
     }
 
 
