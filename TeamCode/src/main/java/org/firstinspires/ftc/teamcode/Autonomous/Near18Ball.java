@@ -193,6 +193,9 @@ public class Near18Ball extends LinearOpMode {
                 )
                 .setGlobalConstantHeadingInterpolation(leavePose.getHeading())
                 .build();
+        turret.setFollowerHandler(followerHandler);
+        turret.setGoal(lights.getTeamColor());
+        turret.setState(Turret.States.AIM);
     }
 
     int prevPath = 0;
@@ -211,6 +214,7 @@ public class Near18Ball extends LinearOpMode {
         turret.initiate(hardwareMap);
         turret.setState(Turret.States.AIM);
 
+        buildPaths();
         command = new Command(flywheel, gate, intake, followerHandler);
 
         //Chamber
@@ -254,8 +258,9 @@ public class Near18Ball extends LinearOpMode {
             flywheel.auto = true;
             flywheel.calculateZone(shootPose,lights.getTeamColor());
             turret.setFollowerHandler(followerHandler);
-            turret.setState(Turret.States.MANUAL);
             turret.setGoal(lights.getTeamColor());
+            turret.setState(Turret.States.AIM);
+            turret.calculateHeading();
             turret.update();
 
             flywheel.update();
@@ -280,8 +285,9 @@ public class Near18Ball extends LinearOpMode {
 
             switch (path) {
                 case 0:
+                    turret.setState(Turret.States.MANUAL);
                     turret.calculateOverrideAngle(lights.getTeamColor(),-92);
-                    path += command.runFollow(shootPrescore, 2400);
+                    path += command.runFollow(shootPrescore, 2300);
                     flywheel.setState(Flywheel.States.SPINNING);
                     break;
                 case 1:
@@ -314,7 +320,7 @@ public class Near18Ball extends LinearOpMode {
                     }
                     break;
                 case 6:
-                    path += command.runFollow(intakeSecond,1700);
+                    path += command.runFollow(intakeSecond,1500);
                     intake.setState(Intake.States.INTAKE);
 
                     break;
@@ -322,7 +328,7 @@ public class Near18Ball extends LinearOpMode {
                     turret.calculateOverrideAngle(lights.getTeamColor(),-102);
                     path += command.runFollow(shoot3,1900);
                     flywheel.setState(Flywheel.States.SPINNING);
-                    if (stopwatch.getTimePassed() > 1200) {
+                    if (stopwatch.getTimePassed() > 300) {
                         intake.setState(Intake.States.OFF);
                     }else{
                         intake.setState(Intake.States.INTAKE);
@@ -338,13 +344,13 @@ public class Near18Ball extends LinearOpMode {
                     }
                     break;
                 case 10:
-                    path += command.runFollow(intakeSecond,1700);
+                    path += command.runFollow(intakeSecond,1500);
                     intake.setState(Intake.States.INTAKE);
 
                     break;
                 case 11:
                     path += command.runFollow(shoot3,1900);
-                    if (stopwatch.getTimePassed() > 1200) {
+                    if (stopwatch.getTimePassed() > 300) {
                         intake.setState(Intake.States.OFF);
                     }else{
                         intake.setState(Intake.States.INTAKE);
@@ -371,7 +377,7 @@ public class Near18Ball extends LinearOpMode {
                     path += command.runShoot(true);
                     break;
                 case 16:
-                    path += command.runFollow(intakeFourth,2200);
+                    path += command.runFollow(intakeFourth,2000);
                     if (stopwatch.getTimePassed() > 1000) {
                         intake.setState(Intake.States.INTAKE);
                     }
@@ -379,8 +385,8 @@ public class Near18Ball extends LinearOpMode {
                     break;
                 case 17:
                     turret.calculateOverrideAngle(lights.getTeamColor(),-77);
-                    path += command.runFollow(shoot5,2300);
-                    if (stopwatch.getTimePassed() > 800) {
+                    path += command.runFollow(shoot5,2100);
+                    if (stopwatch.getTimePassed() > 300) {
                         intake.setState(Intake.States.OFF);
                     }else{
                         intake.setState(Intake.States.INTAKE);

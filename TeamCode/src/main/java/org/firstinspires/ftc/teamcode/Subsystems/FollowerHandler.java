@@ -119,7 +119,10 @@ public class FollowerHandler {
         follower = Constants.createFollower(hardwareMap);
         follower.breakFollowing();
         setPathMode();
-        savedPose = defaultPose;
+        if (!saved) {
+            savedPose = defaultPose;
+        }
+        saved = false;
         setStartingPose(savedPose);
     }
     public void forceRelocalize(Lights.TeamColors teamColor){

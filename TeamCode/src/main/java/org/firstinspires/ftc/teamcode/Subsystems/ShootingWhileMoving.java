@@ -13,7 +13,8 @@ public class ShootingWhileMoving {
     public static double distanceNear = 65;
     public static long travelTimeFar = 900;
     public static double distanceFar = 140;
-    public static double turretDampening = 1;
+    public static double turretDampening = 0.9;
+    public static double velocityThreshold = 5;
 
     //
     static double distance = 0; //Distance from goal (INCH)
@@ -49,6 +50,11 @@ public class ShootingWhileMoving {
 
         //Calculate target pose based on deltaX and deltaY
         targetPose = new Pose(goal.getX() - deltaX, goal.getY() - deltaY);
+
+        if (Math.abs(followerHandler.getVX()) < velocityThreshold && Math.abs(followerHandler.getVY()) < velocityThreshold){
+            return goal;
+        }
+
         return targetPose;
 
     }

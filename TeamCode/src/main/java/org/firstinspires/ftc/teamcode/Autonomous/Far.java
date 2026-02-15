@@ -115,6 +115,9 @@ public class Far extends LinearOpMode {
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
+        turret.setFollowerHandler(followerHandler);
+        turret.setGoal(lights.getTeamColor());
+        turret.setState(Turret.States.AIM);
 
 
     }
@@ -136,6 +139,7 @@ public class Far extends LinearOpMode {
         command = new Command(flywheel, gate, intake, followerHandler);
 
         //Chamber
+        buildPaths();
         boolean initial = true;
         while (!opModeIsActive() && !isStopRequested()) {
             if (initial) {
@@ -177,9 +181,12 @@ public class Far extends LinearOpMode {
             flywheel.auto = true;
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
-            turret.setState(Turret.States.MANUAL);
-            turret.calculateOverrideAngle(lights.getTeamColor(),-71);
+            turret.setState(Turret.States.AIM);
+            turret.calculateHeading();
             turret.update();
+
+            lights.save();
+            followerHandler.saveLoop();
 
 
             flywheel.calculateZone(shootPose, lights.getTeamColor());

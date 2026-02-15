@@ -34,9 +34,9 @@ public class Shoot {
             intake.setState(Intake.States.OFF);
             initial = true;
             done = true;
-            flywheel.shooting = false;
+            flywheel.setState(Flywheel.States.PASSIVE);
             if (!flywheelStaySpinning) {
-                flywheel.setState(Flywheel.States.PASSIVE);
+                flywheel.shooting = false;
             }
             return 1;
         }

@@ -26,9 +26,17 @@ public class Intake {
     public static double farZonePower = 1; //Spin slightly slower to slow down shooting to allow for flywheel to get back to speed faster
     public static double nearZonePower = 1;
     public static double ejectPower = -1;
+    public static long intakeFullTime = 400;
+    Timer intakeFullTimer = new Timer();
+    public BallDetector getBallDetector(){
+        return ballDetector;
+    }
 
 
     public void setState(States newStates){
+        if (newStates == States.INTAKE && currentState != States.INTAKE){
+            intakeFullTimer.setWait(intakeFullTime);
+        }
         currentState = newStates;
     }
     public void setZone(Flywheel.Zone zone){
@@ -66,7 +74,20 @@ public class Intake {
 
         ballDetector.initiate(hardwaremap);
     }
+    public LimeLight.BallColors prevBall = LimeLight.BallColors.NONE;
     public void update(){
+        if (currentState == States.INTAKE){
+            if (ballDetector.getBallColor() == LimeLight.BallColors.NONE){
+                intakeFullTimer.setWait(intakeFullTime);
+            }
+            if (prevBall == LimeLight.BallColors.NONE && ballDetector.getBallColor() != LimeLight.BallColors.NONE){
+                intakeFullTimer.setWait(intakeFullTime);
+            }
+            if (prevBall == ballDetector.getBallColor() && intakeFullTimer.doneWaiting()){
+                currentState = States.OFF;
+            }
+        }
+        prevBall = ballDetector.getBallColor();
         switch(currentState){
             case INTAKE:
                 intakeMotor.setPower(intakePower);
@@ -94,6 +115,7 @@ public class Intake {
         telemetry.addLine("INTAKE ------");
         telemetry.addData("Power",intakeMotor.getPower());
         telemetry.addData("State",currentState);
+        ballDetector.status(telemetry);
     }
 }
 

@@ -42,6 +42,8 @@ public class LimeLight {
     public static double distanceThreshold = 4;
     public static double headingThresholdDegrees = 5;
     public static int numberOfLocalizationAttempts = 30;
+    public static long relocalizationOverrideTime = 500;
+    Timer relocalizeTimer = new Timer();
     static BallColors[] motif = {BallColors.P, BallColors.P, BallColors.G};
 
     public BallColors[] getMotif() {
@@ -188,7 +190,7 @@ public class LimeLight {
             localized = false;
         }
         if (mode == Mode.RELOCALIZE){
-            if (localizeSequence > numberOfLocalizationAttempts){
+            if (localizeSequence > numberOfLocalizationAttempts || relocalizeTimer.doneWaiting()){
                 mode = Mode.RESTING;
                 localizeSequence = 0;
                 localized = true;
@@ -262,6 +264,7 @@ public class LimeLight {
     public void relocalize(){
         localizeSequence = 0;
         mode = Mode.RELOCALIZE;
+        relocalizeTimer.setWait(relocalizationOverrideTime);
     }
 
 }
