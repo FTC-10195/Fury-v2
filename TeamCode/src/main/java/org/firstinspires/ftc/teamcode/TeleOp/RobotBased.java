@@ -50,16 +50,6 @@ public class RobotBased extends LinearOpMode {
         turret.setState(Turret.States.RESET);
         Gate gate = new Gate();
         gate.initiate(hardwareMap);
-        Sorter sorter = new Sorter();
-        sorter.initiate(hardwareMap);
-        turret.setGoal(lights.getTeamColor());
-        turret.setFollowerHandler(followerHandler);
-        flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
-        intake.setZone(flywheel.getZone());
-        drivetrain.setYaw(followerHandler.getFollower().getHeading());
-        lights.setBall(intake.getBallDetector().getBallColor());
-        waitForStart();
-
 
         LimeLight limeLight = new LimeLight();
         limeLight.initiate(hardwareMap);
