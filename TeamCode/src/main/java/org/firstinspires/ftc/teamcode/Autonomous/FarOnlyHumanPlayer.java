@@ -116,7 +116,9 @@ public class FarOnlyHumanPlayer extends LinearOpMode {
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
 
-
+        turret.setFollowerHandler(followerHandler);
+        turret.setGoal(lights.getTeamColor());
+        turret.setState(Turret.States.AIM);
     }
 
     @Override
@@ -134,6 +136,7 @@ public class FarOnlyHumanPlayer extends LinearOpMode {
         turret.setState(Turret.States.AIM);
 
         command = new Command(flywheel, gate, intake, followerHandler);
+        buildPaths();
 
         //Chamber
         boolean initial = true;
@@ -177,8 +180,8 @@ public class FarOnlyHumanPlayer extends LinearOpMode {
             flywheel.auto = true;
             turret.setFollowerHandler(followerHandler);
             turret.setGoal(lights.getTeamColor());
-            turret.setState(Turret.States.MANUAL);
-            turret.calculateOverrideAngle(lights.getTeamColor(),-71);
+            turret.setState(Turret.States.AIM);
+            turret.calculateHeading();
             turret.update();
 
 

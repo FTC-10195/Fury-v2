@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
+import org.firstinspires.ftc.teamcode.Subsystems.Sorting.Sorter;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @TeleOp
@@ -31,7 +32,7 @@ public class RobotBased extends LinearOpMode {
         Pose holdPose = new Pose(0,0,0);
         boolean hold = false;
         States state = States.RESTING;
-        waitForStart();
+
         FollowerHandler followerHandler = new FollowerHandler();
         followerHandler.initiate(hardwareMap);
         Flywheel flywheel = new Flywheel();
@@ -49,6 +50,16 @@ public class RobotBased extends LinearOpMode {
         turret.setState(Turret.States.RESET);
         Gate gate = new Gate();
         gate.initiate(hardwareMap);
+        Sorter sorter = new Sorter();
+        sorter.initiate(hardwareMap);
+        turret.setGoal(lights.getTeamColor());
+        turret.setFollowerHandler(followerHandler);
+        flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
+        intake.setZone(flywheel.getZone());
+        drivetrain.setYaw(followerHandler.getFollower().getHeading());
+        lights.setBall(intake.getBallDetector().getBallColor());
+        waitForStart();
+
 
         LimeLight limeLight = new LimeLight();
         limeLight.initiate(hardwareMap);
@@ -91,15 +102,24 @@ public class RobotBased extends LinearOpMode {
             boolean X2 = gamepad2.cross && !previousGamepad2.cross; //Relocalize limelight
             boolean left2 = gamepad2.dpad_left && !previousGamepad2.dpad_left;
             boolean right2 = gamepad2.dpad_right && !previousGamepad2.dpad_right;
+            boolean share2 = gamepad2.share && !previousGamepad1.share;
 
 
 
             boolean RB2 = gamepad2.right_bumper && !previousGamepad2.right_bumper; //Turn off turret
             boolean up2 = gamepad2.dpad_up && !previousGamepad2.dpad_up; //Increase flywheel manual power
             boolean down2 = gamepad2.dpad_down && !previousGamepad2.dpad_down; //Decrease flywheel manual power
+            boolean options2 = gamepad2.options && !previousGamepad2.options;
 
             previousGamepad1.copy(gamepad1);
             previousGamepad2.copy(gamepad2);
+
+            if (options2){
+                Turret.shootWhileMoving = !Turret.shootWhileMoving;
+            }
+            if (share2){
+                limeLight.automaticRelocalization = !limeLight.automaticRelocalization;
+            }
 
             if (circle || circle2){
                // drivetrain.flipMode();
@@ -180,6 +200,7 @@ public class RobotBased extends LinearOpMode {
                     flywheel.setState(Flywheel.States.PASSIVE);
                     if (LT) {
                         state = States.INTAKING;
+                        intake.setState(Intake.States.INTAKE);
                     }
                     if (RT) {
                         state = States.PREPARING_TO_FIRE;
@@ -188,11 +209,12 @@ public class RobotBased extends LinearOpMode {
                 case INTAKING:
                     turret.setState(Turret.States.RESET);
                     flywheel.shooting = false;
-                    intake.setState(Intake.States.INTAKE);
                     flywheel.setState(Flywheel.States.PASSIVE);
-                   // lights.setMode(Lights.Mode.INTAKING);
+                    lights.setMode(Lights.Mode.INTAKING);
+                    intake.setState(Intake.States.INTAKE);
                     if (LT) {
                         state = States.RESTING;
+                        intake.setState(Intake.States.OFF);
                     }
                     if (RT) {
                         state = States.PREPARING_TO_FIRE;
@@ -202,10 +224,11 @@ public class RobotBased extends LinearOpMode {
                     flywheel.shooting = false;
                     turret.setState(Turret.States.AIM);
                     flywheel.setState(Flywheel.States.SPINNING);
+                    intake.setState(Intake.States.OFF);
                     if (LT) {
                         state = States.INTAKING;
+                        intake.setState(Intake.States.INTAKE);
                     }
-                    intake.setState(Intake.States.OFF);
                     if (flywheel.isReady) {
                         if (flywheel.withinTolerance()) {
                             gamepad1.rumble(1, 10, 100);
@@ -242,22 +265,20 @@ public class RobotBased extends LinearOpMode {
             if (override){
                 lights.setMode(Lights.Mode.OVERRIDE_MODE);
             }else{
-                lights.setMode(Lights.Mode.TEAM);
+                if (state == States.INTAKING){
+                    lights.setMode(Lights.Mode.INTAKING);
+                }else{
+                    lights.setMode(Lights.Mode.TEAM);
+                }
             }
             if (followerHandler.getState() != FollowerHandler.State.RESTING){
                 lights.setMode(Lights.Mode.FOLLOWER_MODE);
             }
 
         //    lights.setMotif(limeLight.getMotif());
-            turret.setGoal(lights.getTeamColor());
-            turret.setFollowerHandler(followerHandler);
-            flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
-            intake.setZone(flywheel.getZone());
-            drivetrain.setYaw(followerHandler.getFollower().getHeading());
 
 
-
-            limeLight.update(telemetry);
+            limeLight.update(telemetry,followerHandler);
 
 
             flywheel.update();
@@ -265,13 +286,18 @@ public class RobotBased extends LinearOpMode {
             intake.update();
             gate.update();
             followerHandler.update();
+            sorter.update();
             if (followerHandler.getState() == FollowerHandler.State.RESTING) {
                 drivetrain.update(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
 
-            if (limeLight.localized) {
-                followerHandler.setStartingPose(limeLight.getPose(followerHandler.getFollower().getPose()));
-            }
+            turret.setGoal(lights.getTeamColor());
+            turret.setFollowerHandler(followerHandler);
+            flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
+            intake.setZone(flywheel.getZone());
+            drivetrain.setYaw(followerHandler.getFollower().getHeading());
+            lights.setBall(intake.getBallDetector().getBallColor());
+
 
 
             telemetry.addData("State", state);
@@ -287,12 +313,16 @@ public class RobotBased extends LinearOpMode {
             flywheel.status(telemetry);
             turret.status(telemetry);
             followerHandler.status(telemetry);
+            intake.status(telemetry);
             intake.update();
+            sorter.status(telemetry);
             telemetry.update();
 
             limeLight.ftcDashUpdate(telemetryPacket);
             flywheel.updateTelemetryPacket(telemetryPacket);
             followerHandler.ftcDashUpdate(telemetryPacket,lights.getTeamColor());
+            turret.updateFTCDashboard(telemetryPacket);
+
             FtcDashboard.getInstance().sendTelemetryPacket(telemetryPacket);
 
         }

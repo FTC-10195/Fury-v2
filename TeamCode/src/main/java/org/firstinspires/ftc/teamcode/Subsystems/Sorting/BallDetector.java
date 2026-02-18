@@ -6,9 +6,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
+import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 @Config
 public class BallDetector {
+    Timer timer = new Timer();
+    public static long intakeTimeThreshold = 400;
 
     //Will tune thresholds more, hopefully it's this simple (GREEN VS BLUE) but it might not be
     public static int alphaThreshold1 = 250;
@@ -36,6 +39,9 @@ public class BallDetector {
     }
     public boolean isBall(){
         return getBallColor() != LimeLight.BallColors.NONE;
+    }
+    public boolean isFull(){
+        return timer.doneWaiting();
     }
     public void status(Telemetry telemetry){
         telemetry.addLine("COLOR SENSORS -----------");

@@ -43,11 +43,11 @@ public class Flywheel {
     public static double farTestDistance = 140;
     public static double passivePower = .25;
     public static double autoPassivePower = .35;
-    public static double kFDefault = .38;
+    public static double kFDefault = .27;
     public static double kP = 0.0027;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.0006;
+    public static double kF = 0.00045;
     public static double tolerance = 50;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
@@ -187,16 +187,21 @@ public class Flywheel {
     }
     public double calculateVelocity(){
          //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
-        return (3.61531 * distance) + 755.35408;
+        //return (3.61531 * distance) + 755.35408;
        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
-        //return (3.42442 * distance) +772.86304;
+        //return (3.42442 * distance) +RG772.86304;
+       // return (3.73037 * distance) + 765.78184;
+        if (distance < 70){
+            return 1250;
+        }
+        return (3.64569 * distance)+910.8025;
     }
 
 
     public void update() {
         targetVelocity = calculateVelocity() + velocityOffset;
         if (mode == Mode.MANUAL_VELOCITY){
-            targetVelocity = manualVelocity;
+            targetVelocity = manualVelocity + velocityOffset;
         }
       //  targetVelocity = defaultVelocity;
 

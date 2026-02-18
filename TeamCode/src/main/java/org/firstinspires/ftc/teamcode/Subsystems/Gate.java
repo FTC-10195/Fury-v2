@@ -17,7 +17,7 @@ public class Gate {
     public static double closePos = .67;
     public static double openPos = .5;
     public static long gateWaitTime = 800;
-    public static long gateTransitionTime = 250;
+    public static long gateTransitionTime = 220;
     State currentState = State.CLOSE;
     Timer timer = new Timer();
     Servo servo;

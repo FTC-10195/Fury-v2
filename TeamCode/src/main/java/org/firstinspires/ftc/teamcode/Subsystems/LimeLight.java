@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.pedropathing.ftc.InvertedFTCCoordinates;
-import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -16,8 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 
@@ -41,7 +36,12 @@ public class LimeLight {
     public static Pose blueGoalPos = new Pose(16, 132.61119515885022, Math.toRadians(140));
     public static double distanceThreshold = 4;
     public static double headingThresholdDegrees = 5;
-    public static int numberOfLocalizationAttempts = 30;
+    public static int numberOfLocalizationAttempts = 8;
+    public static long relocalizationOverrideTime = 500;
+    public static long relocalizationCooldownTime = 10000;
+    Timer relocalizeOverideTimer = new Timer();
+    Timer relocalizeCooldownTimer = new Timer();
+
     static BallColors[] motif = {BallColors.P, BallColors.P, BallColors.G};
 
     public BallColors[] getMotif() {
@@ -53,6 +53,7 @@ public class LimeLight {
     public static int GPPId = 21;
     public static int PGPId = 22;
     public static int PPGId = 23;
+    public static double velocityCountsAsMovingThreshold = 5;
 
     public static Pose getPoseFromId(int i) {
         Pose pose = new Pose(0, 0, 0);
@@ -82,6 +83,7 @@ public class LimeLight {
     public boolean localized = false;
     int localizeSequence = 0;
     int relocalizingId = 0;
+    public boolean automaticRelocalization = true;
     Limelight3A limelight;
 
     ArrayList<Pose> relocalizePositions = new ArrayList<>();
@@ -182,18 +184,53 @@ public class LimeLight {
         }
         return  poses;
     }
+    public void relocalize(){
+        relocalizeCooldownTimer.setWait(relocalizationCooldownTime);
+        localizeSequence = 0;
+        mode = Mode.RELOCALIZE;
+        relocalizeOverideTimer.setWait(relocalizationOverrideTime);
+    }
+    public void autoRelocalize(Telemetry telemetry,FollowerHandler followerHandler){
+        //Not already relocalizing
+        telemetry.addData("MODE: ", mode);
+        telemetry.addData("CAN RELOCALIZE",canRelocalize);
+        telemetry.addData("VELOCITY WORKS",Math.abs(followerHandler.getFollower().getVelocity().getMagnitude()) > velocityCountsAsMovingThreshold);
+        telemetry.addData("Cooldown ON", !relocalizeCooldownTimer.doneWaiting());
+        telemetry.addData("Automatic Relocalization",automaticRelocalization);
+        if (!automaticRelocalization){
+            return;
+        }
+        if (!relocalizeCooldownTimer.doneWaiting()){
+            return;
+        }
+        if (mode == Mode.RELOCALIZE){
+            return;
+        }
+        //No reading or no tag in sight
+        if (!canRelocalize){
+            return;
+        }
+        //No moving
+        if (Math.abs(followerHandler.getFollower().getVelocity().getMagnitude()) > velocityCountsAsMovingThreshold){
+            return;
+        }
+        relocalize();
+    }
 
-    public void update(Telemetry telemetry) {
+    public void update(Telemetry telemetry, FollowerHandler followerHandler) {
+        autoRelocalize(telemetry,followerHandler);
         if (localized == true && mode == Mode.RESTING){
             localized = false;
         }
         if (mode == Mode.RELOCALIZE){
-            if (localizeSequence > numberOfLocalizationAttempts){
+            if (localizeSequence > numberOfLocalizationAttempts || relocalizeOverideTimer.doneWaiting() || Math.abs(followerHandler.getFollower().getVelocity().getMagnitude()) > velocityCountsAsMovingThreshold){
                 mode = Mode.RESTING;
                 localizeSequence = 0;
                 localized = true;
                 relocalizePose = findAveragePose(removeOutliers(relocalizePositions));
                 relocalizePositions.clear();
+                followerHandler.setStartingPose(getPose(followerHandler.getFollower().getPose()));
+
 
             }else{
                 relocalizePositions.add(pedroPose);
@@ -242,6 +279,7 @@ public class LimeLight {
             telemetry.addData("Pedro Position", pedroPose);
             telemetry.addData("Relocalize Id", relocalizingId);
             telemetry.addData("Mode",mode);
+            telemetry.addData("V Magnitude",followerHandler.getFollower().getVelocity().getMagnitude());
         }
 
     }
@@ -259,9 +297,6 @@ public class LimeLight {
         telemetryPacket.put("Relocalize Pose Y",relocalizePose.getY());
         telemetryPacket.put("Relocalize Pose Heading Degrees",Math.toDegrees(relocalizePose.getHeading()));
     }
-    public void relocalize(){
-        localizeSequence = 0;
-        mode = Mode.RELOCALIZE;
-    }
+
 
 }

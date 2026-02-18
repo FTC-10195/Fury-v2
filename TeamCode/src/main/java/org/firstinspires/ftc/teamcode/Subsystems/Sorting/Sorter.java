@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Sorting;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
-
+@Config
 public class Sorter {
     public static double rightServoRightPos = 0.3;
     public static double rightServoCenterPos = 0.5;

@@ -52,6 +52,10 @@ public class Lights {
     double color = 0;
     public void initiate(HardwareMap hardwareMap) {
         rgbIndicator = hardwareMap.get(Servo.class, "rgb");
+        if (saved){
+            teamColor = savedColor;
+        }
+        saved = false;
     }
     LimeLight.BallColors ball = LimeLight.BallColors.NONE;
     LimeLight.BallColors[] motif = new LimeLight.BallColors[] {LimeLight.BallColors.P, LimeLight.BallColors.P, LimeLight.BallColors.G};
@@ -150,11 +154,7 @@ public class Lights {
         telemetry.addData("Saved Color",savedColor);
         telemetry.addData("Saved",saved);
         rgbIndicator.setPosition(color);
-      /*  if (saved){
-            teamColor = savedColor;
-        }
 
-       */
         switch (mode){
             case TEAM:
             switch (teamColor) {

@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Commands.Shoot;
 
 @Config
 public class Turret {
@@ -18,13 +20,13 @@ public class Turret {
     Servo rightServo; //Dominant
     Servo leftServo;
     public boolean on = true;
-    public static double startPos = .5;
+    public static double startPos = .51;
     public static double maxDegrees = 327.27;
     public static double overridePos = .51;
     public static double maxPos = .85;
     public static double minPos = 0;
 
-    public static boolean shootWhileMoving = false;
+    public static boolean shootWhileMoving = true;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
@@ -173,6 +175,9 @@ public class Turret {
         rightServo.setPosition(target);
         leftServo.setPosition(target);
 
+    }
+    public void updateFTCDashboard(TelemetryPacket telemetryPacket){
+        ShootingWhileMoving.updateFTCDashboard(telemetryPacket);
     }
 
 
