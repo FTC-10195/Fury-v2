@@ -2,11 +2,10 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.pedropathing.paths.PathChain;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 public class Command {
     Flywheel flywheel;

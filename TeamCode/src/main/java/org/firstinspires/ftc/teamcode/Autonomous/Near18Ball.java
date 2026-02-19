@@ -12,12 +12,13 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Commands.Stopwatch;
-import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Turret;
 
 @Autonomous
 @Config
@@ -193,8 +194,7 @@ public class Near18Ball extends LinearOpMode {
                 )
                 .setGlobalConstantHeadingInterpolation(leavePose.getHeading())
                 .build();
-        turret.setFollowerHandler(followerHandler);
-        turret.setGoal(lights.getTeamColor());
+        ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
         turret.setState(Turret.States.AIM);
     }
 
@@ -256,9 +256,8 @@ public class Near18Ball extends LinearOpMode {
 
             followerHandler.update();
             flywheel.auto = true;
-            flywheel.calculateZone(shootPose,lights.getTeamColor());
-            turret.setFollowerHandler(followerHandler);
-            turret.setGoal(lights.getTeamColor());
+            ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
+            turret.setState(Turret.States.AIM);
             turret.setState(Turret.States.AIM);
             turret.calculateHeading();
             turret.update();

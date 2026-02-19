@@ -21,10 +21,8 @@ public class Intake {
 
 
     public States currentState = States.OFF;
-    public Flywheel.Zone zone = Flywheel.Zone.NEAR;
     public static double intakePower = 1;
-    public static double farZonePower = 1; //Spin slightly slower to slow down shooting to allow for flywheel to get back to speed faster
-    public static double nearZonePower = 1;
+    public static double shootingPower = 1;
     public static double ejectPower = -1;
     public static long intakeFullTime = 400;
     Timer intakeFullTimer = new Timer();
@@ -38,9 +36,6 @@ public class Intake {
             intakeFullTimer.setWait(intakeFullTime);
         }
         currentState = newStates;
-    }
-    public void setZone(Flywheel.Zone zone){
-        this.zone = zone;
     }
 
 
@@ -102,11 +97,7 @@ public class Intake {
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
             case SHOOTING:
-                if (zone == Flywheel.Zone.NEAR){
-                    intakeMotor.setPower(nearZonePower);
-                }else{
-                    intakeMotor.setPower(farZonePower);
-                }
+                intakeMotor.setPower(shootingPower);
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
         }

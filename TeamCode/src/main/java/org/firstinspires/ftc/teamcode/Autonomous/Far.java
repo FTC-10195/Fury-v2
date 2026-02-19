@@ -10,12 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Commands.Command;
-import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Turret;
 
 @Autonomous
 public class Far extends LinearOpMode {
@@ -115,8 +116,8 @@ public class Far extends LinearOpMode {
                 )
                 .setGlobalConstantHeadingInterpolation(calculateHeading(180))
                 .build();
-        turret.setFollowerHandler(followerHandler);
-        turret.setGoal(lights.getTeamColor());
+        ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
+        turret.setState(Turret.States.AIM);
         turret.setState(Turret.States.AIM);
 
 
@@ -179,17 +180,13 @@ public class Far extends LinearOpMode {
 
             followerHandler.update();
             flywheel.auto = true;
-            turret.setFollowerHandler(followerHandler);
-            turret.setGoal(lights.getTeamColor());
+            ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
             turret.setState(Turret.States.AIM);
             turret.calculateHeading();
             turret.update();
 
             lights.save();
             followerHandler.saveLoop();
-
-
-            flywheel.calculateZone(shootPose, lights.getTeamColor());
 
 
             flywheel.update();

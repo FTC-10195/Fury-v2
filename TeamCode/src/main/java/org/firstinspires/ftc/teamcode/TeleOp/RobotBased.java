@@ -2,21 +2,22 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Hood;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Sorting.Sorter;
-import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Turret;
 
 @TeleOp
 public class RobotBased extends LinearOpMode {
@@ -46,16 +47,13 @@ public class RobotBased extends LinearOpMode {
         lights.setTeamColor(Lights.TeamColors.RED);
         Turret turret = new Turret();
         turret.initiate(hardwareMap);
-        turret.setGoal(lights.getTeamColor());
         turret.setState(Turret.States.RESET);
         Gate gate = new Gate();
         gate.initiate(hardwareMap);
         Sorter sorter = new Sorter();
         sorter.initiate(hardwareMap);
-        turret.setGoal(lights.getTeamColor());
-        turret.setFollowerHandler(followerHandler);
-        flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
-        intake.setZone(flywheel.getZone());
+        Hood hood = new Hood();
+        hood.initiate(hardwareMap);
         drivetrain.setYaw(followerHandler.getFollower().getHeading());
         lights.setBall(intake.getBallDetector().getBallColor());
         waitForStart();
@@ -115,7 +113,7 @@ public class RobotBased extends LinearOpMode {
             previousGamepad2.copy(gamepad2);
 
             if (options2){
-                Turret.shootWhileMoving = !Turret.shootWhileMoving;
+                ShootingWhileMoving.shootWhileMoving = !ShootingWhileMoving.shootWhileMoving;
             }
             if (share2){
                 limeLight.automaticRelocalization = !limeLight.automaticRelocalization;
@@ -280,21 +278,18 @@ public class RobotBased extends LinearOpMode {
 
             limeLight.update(telemetry,followerHandler);
 
-
+            followerHandler.update();
+            ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
             flywheel.update();
             turret.update();
+            hood.update();
             intake.update();
             gate.update();
-            followerHandler.update();
             sorter.update();
             if (followerHandler.getState() == FollowerHandler.State.RESTING) {
                 drivetrain.update(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
 
-            turret.setGoal(lights.getTeamColor());
-            turret.setFollowerHandler(followerHandler);
-            flywheel.calculateZone(followerHandler.getFollower().getPose(),lights.getTeamColor());
-            intake.setZone(flywheel.getZone());
             drivetrain.setYaw(followerHandler.getFollower().getHeading());
             lights.setBall(intake.getBallDetector().getBallColor());
 

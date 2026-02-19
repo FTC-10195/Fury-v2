@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization;
 
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.Lights;
+import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 @Config
 public class Flywheel {
@@ -23,12 +25,7 @@ public class Flywheel {
         NORMAL,
         MANUAL_VELOCITY
     }
-    public enum Zone{
-        FAR,
-        NEAR
-    }
     public boolean on = true;
-    Zone zone = Zone.NEAR;
     Mode mode = Mode.NORMAL;
     public boolean isReady = false;
     public static double manualVelocityGain = 50;
@@ -116,22 +113,6 @@ public class Flywheel {
     double power = 0;
     static double distance = 0;
     double manualVelocity = nearVelocity;
-    public static double getDistance(Pose robotPose,Pose goal){
-        double deltaX = goal.getX() - robotPose.getX();
-        double deltaY = goal.getY() - robotPose.getY();
-        return Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
-    }
-    public void calculateZone(Pose robotPose, Lights.TeamColors color){
-        calculateZone(robotPose,Turret.getGoal(color));
-    }
-    private void calculateZone(Pose robotPose, Pose goal){
-        distance = getDistance(robotPose,goal);
-        if (distance > farDistance){
-            zone = Zone.FAR;
-            return;
-        }
-        zone = Zone.NEAR;
-    }
     public void setManualVelocity(double v){
         manualVelocity = v;
     }
@@ -142,9 +123,6 @@ public class Flywheel {
             return;
         }
         mode = Mode.NORMAL;
-    }
-    public Zone getZone(){
-        return zone;
     }
     public void add(){
         velocityOffset += manualVelocityGain;
@@ -199,6 +177,7 @@ public class Flywheel {
 
 
     public void update() {
+        distance = ShootingWhileMoving.getDistance();
         targetVelocity = calculateVelocity() + velocityOffset;
         if (mode == Mode.MANUAL_VELOCITY){
             targetVelocity = manualVelocity + velocityOffset;

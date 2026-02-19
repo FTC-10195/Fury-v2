@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.geometry.Pose;
@@ -8,7 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Commands.Shoot;
+import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
+import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 
 @Config
 public class Turret {
@@ -25,17 +25,12 @@ public class Turret {
     public static double overridePos = .51;
     public static double maxPos = .85;
     public static double minPos = 0;
-
-    public static boolean shootWhileMoving = true;
     public static double degreesToTicks(double degrees){
         return startPos + (degrees/maxDegrees);
     }
-    public static Pose redGoal = new Pose(144,144);
-    public static Pose blueGoal = new Pose(0,144);
+
     public static double manualGain = .01;
     public double manualOffset = 0;
-    private Pose goal = redGoal;
-    private Pose robotPose = new Pose(0,0,Math.toRadians(0));
     private double target = startPos;
     private States state = States.RESET;
 
@@ -52,12 +47,8 @@ public class Turret {
         manualOffset -= manualGain;
     }
 
-    FollowerHandler followerHandler;
     Pose targetPose; //Calculated TargetPose for shooting while moving
 
-    public void setFollowerHandler(FollowerHandler followerHandler){
-        this.followerHandler = followerHandler;
-    }
 
     public States getState(){
         return state;
@@ -65,47 +56,13 @@ public class Turret {
     public void setState(States state){
         this.state = state;
     }
-    public void setGoal(Lights.TeamColors teamColor){
-        switch (teamColor){
-            case RED:
-                goal = redGoal;
-                break;
-            case BLUE:
-                goal = blueGoal;
-                break;
-        }
-    }
-    public static Pose getGoal(Lights.TeamColors teamColor){
-        switch (teamColor){
-            case RED:
-                return  redGoal;
-            case BLUE:
-                return blueGoal;
-        }
-        return redGoal;
-    }
-    public Pose getGoal(){
-        return goal;
-    }
     double turretAngle;
     public double calculateHeading(){
         //RADIANS
-        deltaX = targetPose.getX() - robotPose.getX();
-        deltaY = targetPose.getY() - robotPose.getY();
+        deltaX = targetPose.getX() - ShootingWhileMoving.getRobotPose().getX();
+        deltaY = targetPose.getY() - ShootingWhileMoving.getRobotPose().getY();
         theta = Math.atan2(deltaY,deltaX);
-        turretAngle = theta - robotPose.getHeading();
-        if (turretAngle > Math.PI){
-            turretAngle = -((2 * Math.PI) - turretAngle);
-        }
-
-        return turretAngle;
-    }
-    public static double calculateHeadingFromPose(Pose targetPose, Pose robotPose){
-        //RADIANS
-        double deltaX = targetPose.getX() - robotPose.getX();
-        double deltaY = targetPose.getY() - robotPose.getY();
-        double theta = Math.atan2(deltaY,deltaX);
-        double turretAngle = theta - robotPose.getHeading();
+        turretAngle = theta - ShootingWhileMoving.getRobotPose().getHeading();
         if (turretAngle > Math.PI){
             turretAngle = -((2 * Math.PI) - turretAngle);
         }
@@ -126,7 +83,7 @@ public class Turret {
         telemetry.addData("Delta Y",deltaY);
         telemetry.addData("On",on);
         telemetry.addData("Theta Degrees", Math.toDegrees(theta));
-        telemetry.addData("Robot heading degrees", Math.toDegrees(robotPose.getHeading()));
+        telemetry.addData("Robot heading degrees", Math.toDegrees(ShootingWhileMoving.getRobotPose().getHeading()));
         telemetry.addData("Turret Degrees", Math.toDegrees(calculateHeading()));
         ShootingWhileMoving.status(telemetry);
     }
@@ -141,15 +98,8 @@ public class Turret {
         overridePos = degreesToTicks(degrees);
     }
     public void update(){
-        if (followerHandler == null){
-            return;
-        }
+        targetPose = ShootingWhileMoving.getAimPose();
 
-        targetPose = goal;
-        robotPose = followerHandler.getFollower().getPose();
-        if (shootWhileMoving){
-            targetPose = ShootingWhileMoving.calculateAimPose(goal,followerHandler);
-        }
 
         switch (state){
             case RESET:

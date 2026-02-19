@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.control.FilteredPIDFCoefficients;
@@ -13,6 +12,9 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Turret;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @Config
 public class FollowerHandler {
@@ -226,7 +228,7 @@ public class FollowerHandler {
         telemetryPacket.put("Robot X",follower.getPose().getX());
         telemetryPacket.put("Robot Y",follower.getPose().getY());
         telemetryPacket.put("Robot Heading",follower.getHeading());
-        telemetryPacket.put("Distance From Goal",Flywheel.getDistance(follower.getPose(),Turret.getGoal(color)));
+        telemetryPacket.put("Distance From Goal", ShootingWhileMoving.getDistance());
 
     }
     public double getVX(){
