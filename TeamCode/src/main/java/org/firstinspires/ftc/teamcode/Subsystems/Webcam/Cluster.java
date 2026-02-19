@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Webcam;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.ArrayList;
 
 public class Cluster {
@@ -78,5 +80,15 @@ public class Cluster {
             }
         }
         return currentCluster;
+    }
+    public void status(Telemetry telemetry){
+        telemetry.addData("Center", getCenter());
+        telemetry.addData("Size", size());
+    }
+    public static void clusterStatus(Telemetry telemetry, ArrayList<Cluster> clusters){
+        for (int i = 0; i < clusters.size(); i++){
+            telemetry.addLine("------ CLUSTER " + i + "------");
+            clusters.get(i).status(telemetry);
+        }
     }
 }

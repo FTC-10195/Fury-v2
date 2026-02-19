@@ -272,6 +272,9 @@ public class RobotBased extends LinearOpMode {
             if (followerHandler.getState() != FollowerHandler.State.RESTING){
                 lights.setMode(Lights.Mode.FOLLOWER_MODE);
             }
+            if (limeLight.getMode() == LimeLight.Mode.RELOCALIZE){
+                lights.setMode(Lights.Mode.RELOCALIZE_MODE);
+            }
 
         //    lights.setMotif(limeLight.getMotif());
 

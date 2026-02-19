@@ -18,7 +18,8 @@ public class Lights {
         MOTIF,
         INTAKING,
         OVERRIDE_MODE,
-        FOLLOWER_MODE
+        FOLLOWER_MODE,
+        RELOCALIZE_MODE
     }
 
     static TeamColors savedColor = TeamColors.RED;
@@ -38,6 +39,8 @@ public class Lights {
     Servo rgbIndicator;
     public static double blue = 0.6;
     public static double red = 0.28;
+    public static double white = 1;
+
     public static double purple = .68;
     public static double green = .5;
     public static double yellow = .35; //Subsystem based/no team
@@ -180,6 +183,9 @@ public class Lights {
                 break;
             case FOLLOWER_MODE:
                 color = green;
+                break;
+            case RELOCALIZE_MODE:
+                color = white;
                 break;
         }
 

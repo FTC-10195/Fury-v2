@@ -32,7 +32,7 @@ public class Webcam {
     VisionPortal portal;
     public static double minArea = 50;
     public static double maxArea = 20000;
-    public static double minCircularity = .6;
+    public static double minCircularity = .2;
     public static double maxCircularity = 1;
     public static double intakeWidth = 16;
     public static int cameraWidth = 320;
@@ -40,7 +40,7 @@ public class Webcam {
     public static double pixelsPerInch = 10;
 
     public static double pixelsToInch(double pixels) {
-        return pixels * pixelsPerInch;
+        return pixels / pixelsPerInch;
     }
 
     public void initiate(HardwareMap hardwareMap) {
@@ -73,7 +73,7 @@ public class Webcam {
                 .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
                 .build();
         portal = new VisionPortal.Builder()
-                .addProcessor(purpleLocator)
+                .addProcessors(purpleLocator,greenLocator)
                 .setCameraResolution(new Size(cameraWidth, cameraHeight))
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .build();
@@ -107,6 +107,12 @@ public class Webcam {
     ArrayList<Cluster> clusters = new ArrayList<>();
 
     public void update(Telemetry telemetry) {
+        if (!clusters.isEmpty()){
+            clusters.clear();
+        }
+        if (!balls.isEmpty()){
+            balls.clear();
+        }
         //Make a list of blobs including purple and green
         List<ColorBlobLocatorProcessor.Blob> blobs = purpleLocator.getBlobs();
         blobs.addAll(greenLocator.getBlobs());
@@ -117,7 +123,7 @@ public class Webcam {
 
         ColorBlobLocatorProcessor.Util.filterByCriteria(
                 ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
-                minArea, maxCircularity, blobs);     /* filter out non-circular blobs.
+                minCircularity, maxCircularity, blobs);     /* filter out non-circular blobs.
          * NOTE: You may want to adjust the minimum value depending on your use case.
          * Circularity values will be affected by shadows, and will therefore vary based
          * on the location of the camera on your robot and venue lighting. It is strongly
@@ -136,15 +142,28 @@ public class Webcam {
         telemetry.addLine("Circularity Radius Center");
 
         // Display the Blob's circularity, and the size (radius) and center location of its circleFit.
-
+        int i = 0;
         for (ColorBlobLocatorProcessor.Blob b : blobs) {
             Circle circleFit = b.getCircle();
             balls.add((double) circleFit.getX());
+            telemetry.addData("ball " + i, circleFit.getCenter());
+            i++;
         }
         clusters = Cluster.createClusters(balls);
+
+        telemetry.addData("Target Inches",targetInches);
+        telemetry.addData("Target Pixels",targetPixels);
+
+        if (clusters.isEmpty()){
+            return;
+        }
         targetCluster = Cluster.getBiggestCluster(clusters);
         targetPixels = targetCluster.getCenter();
         targetInches = pixelsToInch(targetPixels);
+
+
+        Cluster.clusterStatus(telemetry,clusters);
+
 
     }
     public void updateFTCDashboard(TelemetryPacket telemetryPacket){
