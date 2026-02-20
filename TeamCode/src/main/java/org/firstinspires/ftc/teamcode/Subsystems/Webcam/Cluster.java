@@ -70,16 +70,16 @@ public class Cluster {
         }
         return currentCluster;
     }
-    public static Cluster getBiggestCluster(ArrayList<Cluster> clusters){
+    public static ArrayList<Cluster> getBiggestCluster(ArrayList<Cluster> clusters){
         int size = 0;
-        Cluster currentCluster = clusters.get(0);
+        ArrayList<Cluster> newCluster = new ArrayList<>();
         for (int i = 0; i < clusters.size(); i ++){
             if (clusters.get(i).size() > size){
                 size = clusters.get(i).size();
-                currentCluster = clusters.get(i);
+                newCluster.add(clusters.get(i));
             }
         }
-        return currentCluster;
+        return newCluster;
     }
     public void status(Telemetry telemetry){
         telemetry.addData("Center", getCenter());

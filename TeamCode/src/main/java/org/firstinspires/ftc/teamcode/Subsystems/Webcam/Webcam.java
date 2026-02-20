@@ -37,7 +37,9 @@ public class Webcam {
     public static double intakeWidth = 16;
     public static int cameraWidth = 320;
     public static int cameraHeight = 240;
-    public static double pixelsPerInch = 10;
+    public static double pixelsPerInch = 5.8;
+    public static int dilation = 7;
+    public static int blurSize= 5;
 
     public static double pixelsToInch(double pixels) {
         return pixels / pixelsPerInch;
@@ -47,21 +49,21 @@ public class Webcam {
         purpleLocator = new ColorBlobLocatorProcessor.Builder()
                 .setTargetColorRange(ColorRange.ARTIFACT_PURPLE)   // Use a predefined color match
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
-                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 0.5, 1, -1))
                 .setDrawContours(true)   // Show contours on the Stream Preview
                 .setBoxFitColor(0)       // Disable the drawing of rectangles
                 .setCircleFitColor(Color.rgb(255, 255, 0)) // Draw a circle
-                .setBlurSize(5)          // Smooth the transitions between different colors in image
+                .setBlurSize(blurSize)          // Smooth the transitions between different colors in image
 
                 // the following options have been added to fill in perimeter holes.
-                .setDilateSize(15)       // Expand blobs to fill any divots on the edges
-                .setErodeSize(15)        // Shrink blobs back to original size
+                .setDilateSize(dilation)       // Expand blobs to fill any divots on the edges
+                .setErodeSize(dilation)        // Shrink blobs back to original size
                 .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
                 .build();
         greenLocator = new ColorBlobLocatorProcessor.Builder()
                 .setTargetColorRange(ColorRange.ARTIFACT_GREEN)   // Use a predefined color match
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
-                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 0.5, 1, -1))
                 .setDrawContours(true)   // Show contours on the Stream Preview
                 .setBoxFitColor(0)       // Disable the drawing of rectangles
                 .setCircleFitColor(Color.rgb(255, 255, 0)) // Draw a circle
@@ -81,19 +83,19 @@ public class Webcam {
 
     }
 
-    public double targetPixels = 0;
-    public double targetInches = 0;
+    public double targetPixelDisplacement = 0;
+    public double targetIncheDisplacement = 0;
     Cluster targetCluster;
 
-    public double getTargetInches() {
-        return targetInches;
+    public double getTargetIncheDisplacement() {
+        return targetIncheDisplacement;
     }
 
     public double getTargetInches(Lights.TeamColors teamColor) {
         if (teamColor == Lights.TeamColors.RED) {
-            return targetInches * -1;
+            return targetIncheDisplacement * -1;
         }
-        return targetInches;
+        return targetIncheDisplacement;
     }
 
     public void off() {
@@ -151,15 +153,15 @@ public class Webcam {
         }
         clusters = Cluster.createClusters(balls);
 
-        telemetry.addData("Target Inches",targetInches);
-        telemetry.addData("Target Pixels",targetPixels);
+        telemetry.addData("Target Inches", targetIncheDisplacement);
+        telemetry.addData("Target Pixels", targetPixelDisplacement);
 
         if (clusters.isEmpty()){
             return;
         }
-        targetCluster = Cluster.getBiggestCluster(clusters);
-        targetPixels = targetCluster.getCenter();
-        targetInches = pixelsToInch(targetPixels);
+        targetCluster = Cluster.getClosestCluster(Cluster.getBiggestCluster(clusters));
+        targetPixelDisplacement =  targetCluster.getCenter() - (int) (cameraWidth / 2);
+        targetIncheDisplacement = pixelsToInch(targetPixelDisplacement);
 
 
         Cluster.clusterStatus(telemetry,clusters);
@@ -167,6 +169,6 @@ public class Webcam {
 
     }
     public void updateFTCDashboard(TelemetryPacket telemetryPacket){
-        telemetryPacket.put("TargetInches",targetInches);
+        telemetryPacket.put("TargetInches", targetIncheDisplacement);
     }
 }
