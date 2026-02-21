@@ -187,8 +187,11 @@ public class RobotBased extends LinearOpMode {
                 state = States.RESTING;
             }
             
-            if (RB || RB2){
+            if (RB){
                 turret.on = !turret.on;
+            }
+            if (RB2){
+                hood.on = !hood.on;
             }
             switch (state) {
                 case RESTING:

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Hood;
 import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
 import org.firstinspires.ftc.teamcode.Subsystems.Gate;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization
 public class Far extends LinearOpMode {
     private Follower follower;
     private Flywheel flywheel = new Flywheel();
+    private Hood hood = new Hood();
     private Intake intake = new Intake();
     private Lights lights = new Lights();
     private Gate gate = new Gate();
@@ -42,7 +44,7 @@ public class Far extends LinearOpMode {
 
     public void buildPaths() {
 
-        startPose = new Pose(calculateX(56.653555219364605), 7.999999999999998, calculateHeading(180)); // Start Pose of our robot.
+        startPose = new Pose(AutoPresets.calculateXStart(lights.getTeamColor(),56.653555219364605), 7.999999999999998, calculateHeading(180)); // Start Pose of our robot.
 
         intakePose1 = new Pose(calculateX(9.94402420574887), 35.7821482602118, calculateHeading(180));
         intakeControl1 = new Pose(calculateX(67.7836611195159), 38.79425113464447);
@@ -136,6 +138,8 @@ public class Far extends LinearOpMode {
         gate.initiate(hardwareMap);
         turret.initiate(hardwareMap);
         turret.setState(Turret.States.AIM);
+        hood.initiate(hardwareMap);
+        hood.setState(Hood.States.ADJUST);
 
         command = new Command(flywheel, gate, intake, followerHandler);
 
@@ -184,6 +188,7 @@ public class Far extends LinearOpMode {
             turret.setState(Turret.States.AIM);
             turret.calculateHeading();
             turret.update();
+            hood.update();
 
             lights.save();
             followerHandler.saveLoop();

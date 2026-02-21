@@ -113,6 +113,10 @@ public class Flywheel {
     double power = 0;
     static double distance = 0;
     double manualVelocity = nearVelocity;
+    public static double a = 0;
+    public static double b = 3.64569;
+    public static double c = 910.8025;
+    public static double minDistance = 0;
     public void setManualVelocity(double v){
         manualVelocity = v;
     }
@@ -169,10 +173,10 @@ public class Flywheel {
        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
         //return (3.42442 * distance) +RG772.86304;
        // return (3.73037 * distance) + 765.78184;
-        if (distance < 70){
+        if (distance < minDistance){
             return 1250;
         }
-        return (3.64569 * distance)+910.8025;
+        return (a * Math.pow(distance,2)) + (b * distance) + c;
     }
 
 

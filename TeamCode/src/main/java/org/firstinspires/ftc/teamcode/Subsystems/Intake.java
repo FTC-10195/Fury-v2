@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Sorting.BallDetector;
@@ -42,6 +43,10 @@ public class Intake {
     DcMotor intakeMotor;
     DcMotor transferMotor;
     BallDetector ballDetector = new BallDetector();
+    public static double restPos = 0.5;
+    public static double intakePos = 0.2;
+    Servo leftLift;
+    Servo rightLift; //Right dominant
     public States getState() {
         return currentState;
     }
@@ -68,6 +73,9 @@ public class Intake {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ballDetector.initiate(hardwaremap);
+
+        rightLift = hardwaremap.servo.get("rintake");
+        leftLift = hardwaremap.servo.get("lintake");
     }
     public LimeLight.BallColors prevBall = LimeLight.BallColors.NONE;
     public void update(){
@@ -85,10 +93,12 @@ public class Intake {
         prevBall = ballDetector.getBallColor();
         switch(currentState){
             case INTAKE:
+                rightLift.setPosition(intakePos);
                 intakeMotor.setPower(intakePower);
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
             case OFF:
+                rightLift.setPosition(restPos);
                 intakeMotor.setPower(0);
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
@@ -97,10 +107,12 @@ public class Intake {
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
             case SHOOTING:
+                rightLift.setPosition(intakePos);
                 intakeMotor.setPower(shootingPower);
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
         }
+        leftLift.setPosition(1 - rightLift.getPosition());
     }
     public void status(Telemetry telemetry){
         telemetry.addLine("INTAKE ------");

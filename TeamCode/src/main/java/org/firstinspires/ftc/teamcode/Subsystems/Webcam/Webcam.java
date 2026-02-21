@@ -40,6 +40,7 @@ public class Webcam {
     public static double pixelsPerInch = 5.8;
     public static int dilation = 7;
     public static int blurSize= 5;
+    public static double centerOffset = 0;
 
     public static double pixelsToInch(double pixels) {
         return pixels / pixelsPerInch;
@@ -161,7 +162,7 @@ public class Webcam {
         }
         targetCluster = Cluster.getClosestCluster(Cluster.getBiggestCluster(clusters));
         targetPixelDisplacement =  targetCluster.getCenter() - (int) (cameraWidth / 2);
-        targetIncheDisplacement = pixelsToInch(targetPixelDisplacement);
+        targetIncheDisplacement = pixelsToInch(targetPixelDisplacement) + centerOffset;
 
 
         Cluster.clusterStatus(telemetry,clusters);

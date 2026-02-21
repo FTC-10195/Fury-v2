@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.Commands.Command;
 import org.firstinspires.ftc.teamcode.Commands.Stopwatch;
 import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Flywheel;
+import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Hood;
 import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.ShootingWhileMoving;
 import org.firstinspires.ftc.teamcode.Subsystems.EverythingThatNeedsLocalization.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.FollowerHandler;
@@ -29,6 +30,7 @@ public class FarSmart extends LinearOpMode {
     private Gate gate = new Gate();
     private Turret turret = new Turret();
     private Webcam webcam = new Webcam();
+    private Hood hood = new Hood();
     FollowerHandler followerHandler = new FollowerHandler();
     Command command;
     private int path = 0;
@@ -46,7 +48,7 @@ public class FarSmart extends LinearOpMode {
 
     public void buildPaths() {
 
-        startPose = new Pose(calculateX(56.653555219364605), 7.999999999999998, calculateHeading(180)); // Start Pose of our robot.
+        startPose = new Pose(AutoPresets.calculateXStart(lights.getTeamColor(),56.653555219364605), 7.999999999999998, calculateHeading(180)); // Start Pose of our robot.
 
         intakePose1 = new Pose(calculateX(9.94402420574887), 35.7821482602118, calculateHeading(180));
         intakeControl1 = new Pose(calculateX(67.7836611195159), 38.79425113464447);
@@ -174,6 +176,7 @@ public class FarSmart extends LinearOpMode {
         turret.initiate(hardwareMap);
         turret.setState(Turret.States.AIM);
         webcam.initiate(hardwareMap);
+        hood.initiate(hardwareMap);
 
         command = new Command(flywheel, gate, intake, followerHandler);
 
@@ -222,6 +225,7 @@ public class FarSmart extends LinearOpMode {
             ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
             turret.setState(Turret.States.AIM);
             turret.calculateHeading();
+            hood.setState(Hood.States.ADJUST);
             turret.update();
 
             lights.save();
@@ -232,6 +236,7 @@ public class FarSmart extends LinearOpMode {
             intake.update();
             lights.update(telemetry);
             webcam.update(telemetry);
+            hood.update();
             lights.save();
             gate.update();
 
@@ -284,7 +289,7 @@ public class FarSmart extends LinearOpMode {
                     break;
                 case 7:
                     path += command.runShoot(true);
-                    if (stopwatch.getTimePassed() > 400 && !scanned){
+                    if (stopwatch.getTimePassed() > 1000 && !scanned){
                         scanned = true;
                         buildCVIntake();
                     }
@@ -303,7 +308,7 @@ public class FarSmart extends LinearOpMode {
                     break;
                 case 10:
                     path += command.runShoot(true);
-                    if (stopwatch.getTimePassed() > 400 && !scanned){
+                    if (stopwatch.getTimePassed() > 1000 && !scanned){
                         scanned = true;
                         buildCVIntake();
                     }
@@ -322,7 +327,7 @@ public class FarSmart extends LinearOpMode {
                     break;
                 case 13:
                     path += command.runShoot(true);
-                    if (stopwatch.getTimePassed() > 400 && !scanned){
+                    if (stopwatch.getTimePassed() > 1000 && !scanned){
                         scanned = true;
                         buildCVIntake();
                     }
