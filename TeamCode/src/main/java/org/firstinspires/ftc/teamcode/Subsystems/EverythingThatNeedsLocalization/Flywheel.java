@@ -5,13 +5,12 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
-import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 @Config
@@ -38,13 +37,13 @@ public class Flywheel {
 
     public static double nearTestDistance = 95;
     public static double farTestDistance = 140;
-    public static double passivePower = .25;
+    public static double passivePower = .4;
     public static double autoPassivePower = .35;
-    public static double kFDefault = .27;
-    public static double kP = 0.0027;
+    public static double kS = 0.6  ;
+    public static double kP = 0.0025;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0.00045;
+    public static double kF = 0;
     public static double tolerance = 50;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
@@ -56,6 +55,7 @@ public class Flywheel {
     public boolean auto = false;
     public static double defaultManualPower = 0.6;
     public static double manualPowerGain = 0.05;
+    public static double kV = 0.00013;
     private double manualPower = defaultManualPower;
 
     Timer overideTimer = new Timer();
@@ -77,6 +77,7 @@ public class Flywheel {
 
     public States currentState = States.PASSIVE;
     DcMotorEx flywheel;
+    VoltageSensor voltageSensor;
     DcMotorEx flywheel2;
     public void initiate(HardwareMap hardwareMap) {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
@@ -87,6 +88,7 @@ public class Flywheel {
       // flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
 
@@ -115,7 +117,7 @@ public class Flywheel {
     double manualVelocity = nearVelocity;
     public static double a = 0;
     public static double b = 3.64569;
-    public static double c = 910.8025;
+    public static double c = 670.8025;
     public static double minDistance = 0;
     public void setManualVelocity(double v){
         manualVelocity = v;
@@ -174,7 +176,7 @@ public class Flywheel {
         //return (3.42442 * distance) +RG772.86304;
        // return (3.73037 * distance) + 765.78184;
         if (distance < minDistance){
-            return 1250;
+       //     return 1250;
         }
         return (a * Math.pow(distance,2)) + (b * distance) + c;
     }
@@ -202,7 +204,7 @@ public class Flywheel {
         prevPos = flywheel.getCurrentPosition();
 
         currentVelocity = posDifference / (timeDifference) * rMod;
-        power = pidfController.run() + (kF * (targetVelocity - defaultVelocity)) + kFDefault;
+        power = pidfController.run() + (kF * (targetVelocity)) + kS + ((kV * targetVelocity) / (voltageSensor.getVoltage() / 12.0));
 
       switch (getState()){
           case PASSIVE:
@@ -253,6 +255,7 @@ public class Flywheel {
         telemetry.addData("flywheelReady",isReady);
         telemetry.addData("Mode",mode);
         telemetry.addData("Manual Power",manualPower);
+        telemetry.addData("Voltage",voltageSensor.getVoltage());
     }
     public void updateTelemetryPacket(TelemetryPacket telemetryPacket){
         telemetryPacket.put("Target Velocity ",targetVelocity);

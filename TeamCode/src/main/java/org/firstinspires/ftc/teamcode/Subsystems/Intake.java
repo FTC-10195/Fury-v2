@@ -43,8 +43,9 @@ public class Intake {
     DcMotor intakeMotor;
     DcMotor transferMotor;
     BallDetector ballDetector = new BallDetector();
-    public static double restPos = 0.5;
-    public static double intakePos = 0.2;
+    public static double restPos = 0.55;
+    public static double intakePos = 0.35;
+    public static boolean inverse= true;
     Servo leftLift;
     Servo rightLift; //Right dominant
     public States getState() {
@@ -112,7 +113,10 @@ public class Intake {
                 transferMotor.setPower(intakeMotor.getPower());
                 break;
         }
-        leftLift.setPosition(1 - rightLift.getPosition());
+        leftLift.setPosition(rightLift.getPosition());
+        if (inverse){
+            leftLift.setPosition(1 - leftLift.getPosition());
+        }
     }
     public void status(Telemetry telemetry){
         telemetry.addLine("INTAKE ------");

@@ -212,8 +212,8 @@ public class RobotBased extends LinearOpMode {
                     flywheel.shooting = false;
                     flywheel.setState(Flywheel.States.PASSIVE);
                     lights.setMode(Lights.Mode.INTAKING);
-                    intake.setState(Intake.States.INTAKE);
-                    if (LT) {
+                 //   intake.setState(Intake.States.INTAKE);
+                    if (LT  || intake.getState() != Intake.States.INTAKE) {
                         state = States.RESTING;
                         intake.setState(Intake.States.OFF);
                     }
