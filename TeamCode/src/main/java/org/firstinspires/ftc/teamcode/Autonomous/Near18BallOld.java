@@ -262,9 +262,9 @@ public class Near18BallOld extends LinearOpMode {
             ShootingWhileMoving.update(followerHandler,lights.getTeamColor());
             turret.setState(Turret.States.AIM);
             turret.setState(Turret.States.AIM);
-            hood.setState(Hood.States.ADJUST);
             turret.calculateHeading();
             turret.update();
+            flywheel.setState(Flywheel.States.SPINNING);
 
             flywheel.update();
             intake.update();

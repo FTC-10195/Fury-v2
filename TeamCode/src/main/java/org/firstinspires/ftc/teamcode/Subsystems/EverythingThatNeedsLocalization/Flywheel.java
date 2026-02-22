@@ -116,9 +116,10 @@ public class Flywheel {
     static double distance = 0;
     double manualVelocity = nearVelocity;
     public static double a = 0;
-    public static double b = 3.64569;
-    public static double c = 670.8025;
+    public static double b = 3.7;
+    public static double c = 702.5;
     public static double minDistance = 0;
+    public static double maxThreshold = 100;
     public void setManualVelocity(double v){
         manualVelocity = v;
     }
@@ -144,7 +145,7 @@ public class Flywheel {
     }
     public double bangBangCustom(){
         if (!shooting){
-            if (targetVelocity - currentVelocity  > 300){
+            if (targetVelocity - currentVelocity  > maxThreshold){
                 return 1;
             }
             return power;
@@ -174,11 +175,12 @@ public class Flywheel {
         //return (3.61531 * distance) + 755.35408;
        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
         //return (3.42442 * distance) +RG772.86304;
-       // return (3.73037 * distance) + 765.78184;
         if (distance < minDistance){
-       //     return 1250;
+            return 1250;
         }
-        return (a * Math.pow(distance,2)) + (b * distance) + c;
+        return (3.73037 * distance) + 765.78184;
+
+       // return (a * Math.pow(distance,2)) + (b * distance) + c;
     }
 
 

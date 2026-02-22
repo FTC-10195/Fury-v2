@@ -139,7 +139,6 @@ public class Far extends LinearOpMode {
         turret.initiate(hardwareMap);
         turret.setState(Turret.States.AIM);
         hood.initiate(hardwareMap);
-        hood.setState(Hood.States.ADJUST);
 
         command = new Command(flywheel, gate, intake, followerHandler);
 
@@ -188,6 +187,8 @@ public class Far extends LinearOpMode {
             turret.setState(Turret.States.AIM);
             turret.calculateHeading();
             turret.update();
+            flywheel.setState(Flywheel.States.SPINNING);
+
             hood.update();
 
             lights.save();

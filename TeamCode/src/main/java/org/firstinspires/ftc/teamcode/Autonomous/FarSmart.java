@@ -239,6 +239,7 @@ public class FarSmart extends LinearOpMode {
             hood.update();
             lights.save();
             gate.update();
+            flywheel.setState(Flywheel.States.SPINNING);
 
 
             flywheel.status(telemetry);

@@ -20,8 +20,8 @@ public class ShootingWhileMoving {
     public static double distanceFar = 140;
     public static double turretDampening = 0.9;
     public static double velocityThreshold = 5;
-    public static Pose redGoal = new Pose(131.56672158154862,136.38385502471166);
-    public static Pose blueGoal = new Pose(13.89950576606261,135.43492586490936);
+    public static Pose redGoal = new Pose(144,144);
+    public static Pose blueGoal = new Pose(0,144);
 
 
 
