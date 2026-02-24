@@ -5,12 +5,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 import org.firstinspires.ftc.teamcode.Subsystems.Timer;
 
 @Config
@@ -37,25 +38,24 @@ public class Flywheel {
 
     public static double nearTestDistance = 95;
     public static double farTestDistance = 140;
-    public static double passivePower = .4;
+    public static double passivePower = .25;
     public static double autoPassivePower = .35;
-    public static double kS = 0.6  ;
-    public static double kP = 0.0025;
+    public static double kFDefault = .27;
+    public static double kP = 0.0027;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0;
+    public static double kF = 0.00045;
     public static double tolerance = 50;
     public static double maxPower = 1;
     public double currentVelocity = 0.0000;
-    public static double rMod = 1;
-    public static double lMod = -1;
+    public static double rMod = -1;
+    public static double lMod = 1;
     private double targetVelocity = defaultVelocity;
     public double velocityOffset = 0;
     public boolean shooting = false;
     public boolean auto = false;
     public static double defaultManualPower = 0.6;
     public static double manualPowerGain = 0.05;
-    public static double kV = 0.00013;
     private double manualPower = defaultManualPower;
 
     Timer overideTimer = new Timer();
@@ -77,18 +77,16 @@ public class Flywheel {
 
     public States currentState = States.PASSIVE;
     DcMotorEx flywheel;
-    VoltageSensor voltageSensor;
     DcMotorEx flywheel2;
     public void initiate(HardwareMap hardwareMap) {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         flywheel2 = hardwareMap.get(DcMotorEx.class, "fly2");
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-       flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-     //  flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
-      // flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //  flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        // flywheel2.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        voltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
 
@@ -115,11 +113,6 @@ public class Flywheel {
     double power = 0;
     static double distance = 0;
     double manualVelocity = nearVelocity;
-    public static double a = 0;
-    public static double b = 3.7;
-    public static double c = 702.5;
-    public static double minDistance = 0;
-    public static double maxThreshold = 100;
     public void setManualVelocity(double v){
         manualVelocity = v;
     }
@@ -145,7 +138,7 @@ public class Flywheel {
     }
     public double bangBangCustom(){
         if (!shooting){
-            if (targetVelocity - currentVelocity  > maxThreshold){
+            if (targetVelocity - currentVelocity  > 300){
                 return 1;
             }
             return power;
@@ -171,16 +164,15 @@ public class Flywheel {
         return Math.abs(targetVelocity - currentVelocity) < tolerance;
     }
     public double calculateVelocity(){
-         //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
+        //   return (0.0081474 * Math.pow(distance,2)) + (0.611543 * (distance)) + 933.35737;
         //return (3.61531 * distance) + 755.35408;
-       // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
+        // return (0.00108852 * Math.pow(distance,3)) - (0.443267 * Math.pow(distance,2)) + (62.24469 * (distance)) - 1758.29271;
         //return (3.42442 * distance) +RG772.86304;
-        if (distance < minDistance){
+        // return (3.73037 * distance) + 765.78184;
+        if (distance < 70){
             return 1250;
         }
-        return (3.73037 * distance) + 765.78184;
-
-       // return (a * Math.pow(distance,2)) + (b * distance) + c;
+        return (3.64569 * distance)+910.8025;
     }
 
 
@@ -190,7 +182,7 @@ public class Flywheel {
         if (mode == Mode.MANUAL_VELOCITY){
             targetVelocity = manualVelocity + velocityOffset;
         }
-      //  targetVelocity = defaultVelocity;
+        //  targetVelocity = defaultVelocity;
 
         pidfController.setCoefficients((new PIDFCoefficients(kP,kI,kD,0)));
         pidfController.setTargetPosition(targetVelocity);
@@ -206,37 +198,37 @@ public class Flywheel {
         prevPos = flywheel.getCurrentPosition();
 
         currentVelocity = posDifference / (timeDifference) * rMod;
-        power = pidfController.run() + (kF * (targetVelocity)) + kS + ((kV * targetVelocity) / (voltageSensor.getVoltage() / 12.0));
+        power = pidfController.run() + (kF * (targetVelocity - defaultVelocity)) + kFDefault;
 
-      switch (getState()){
-          case PASSIVE:
+        switch (getState()){
+            case PASSIVE:
 
-              power = passivePower;
-              if (auto){
-                  power = autoPassivePower;
-              }
+                power = passivePower;
+                if (auto){
+                    power = autoPassivePower;
+                }
 
-              shooting = false;
-              if (!on){
-                  power = 0;
-              }
+                shooting = false;
+                if (!on){
+                    power = 0;
+                }
 
 
-              isReady = false;
-              break;
-          case SPINNING:
-            //  power = maxPower;
-              if (overideTimer.doneWaiting() || withinTolerance()){
-                  isReady = true;
-              }
-              power = bangBangCustom();
-              if (mode == Mode.MANUAL_POWER){
-                  power = manualPower;
-              }
-             // power = spike();
-              break;
+                isReady = false;
+                break;
+            case SPINNING:
+                //  power = maxPower;
+                if (overideTimer.doneWaiting() || withinTolerance()){
+                    isReady = true;
+                }
+                power = bangBangCustom();
+                if (mode == Mode.MANUAL_POWER){
+                    power = manualPower;
+                }
+                // power = spike();
+                break;
 
-      }
+        }
 
         if (Math.abs(power) > maxPower){
             power = Math.signum(power) * maxPower;
@@ -257,7 +249,6 @@ public class Flywheel {
         telemetry.addData("flywheelReady",isReady);
         telemetry.addData("Mode",mode);
         telemetry.addData("Manual Power",manualPower);
-        telemetry.addData("Voltage",voltageSensor.getVoltage());
     }
     public void updateTelemetryPacket(TelemetryPacket telemetryPacket){
         telemetryPacket.put("Target Velocity ",targetVelocity);
