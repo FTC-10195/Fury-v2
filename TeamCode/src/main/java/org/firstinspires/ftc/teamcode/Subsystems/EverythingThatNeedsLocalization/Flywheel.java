@@ -172,7 +172,7 @@ public class Flywheel {
         if (distance < 70){
             return 1250;
         }
-        return (3.64569 * distance)+910.8025;
+        return (3.64569 * distance)+800.8025;
     }
 
 
